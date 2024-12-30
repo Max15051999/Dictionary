@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>DICTIONARY</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/index.css') }}">
+</head>
+<body>
+ <div class="container">
+     {% include 'theme.html' %}
+     <h1>Dictionary</h1>
+     <hr><br><br><br>
+     <a href="/translate/"><button><b>Переводчик</b></button></a><br><br><br>
+     <a href="/add_new_word/"><button><b>Добавить слово</b></button></a><br><br><br>
+     <a href="/dictionaries/"><button><b>Мои словари</b></button></a><br><br><br>
+     <a href="/guess_words/"><button><b>Угадай слова</b></button></a><br><br><br>
+
+ </div>
+ <script src="{{url_for('static', filename='scripts/theme.js')}}"></script>
+</body>
+</html>

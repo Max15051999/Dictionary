@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>My dictionaries</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/dictionary_type.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/index.css') }}">
+</head>
+<body>
+  <div class="container">
+    {% include 'theme.html' %}
+    <h1>{{title}} ({{my_dicts|length}})</h1>
+    <hr><br><br><br>
+
+    {% if my_dicts|length > 0 %}
+        <table id="dicts-table">
+            {% for dict in my_dicts %}
+                <tr>
+                    <td>
+                        <a href='/{{next_page}}/{{dict.0}}/'><button>{{dict.0}}-русский словарь</button></a>
+                    </td>
+                </tr>
+            {% endfor %}
+        </table>
+    {% endif %}
+    <hr><br><br><br>
+    <a href="/"><button>Назад</button></a>
+    <script src="{{url_for('static', filename='scripts/theme.js')}}"></script>
+  </div>
+</body>
+</html>

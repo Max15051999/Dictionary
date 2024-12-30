@@ -1,0 +1,41 @@
+body {
+    background: black;
+}
+
+.container {
+    color: red;
+    text-align: center;
+}
+
+#trans-table {
+    width: 100%;
+    text-align: center;
+}
+
+#first-lang {
+
+}
+
+#second-lang {
+
+}
+
+#change-langs {
+
+}
+
+textarea {
+    width: 100%;
+    height: 100%;
+    background-color: white;
+    font-size: 20px;
+}
+
+#original-input-word {
+
+}
+
+#read-translate {
+
+}
+

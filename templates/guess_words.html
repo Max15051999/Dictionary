@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Guess Words</title>
+    <link rel="stylesheet" href="{{url_for('static', filename='css/index.css')}}">
+    <link rel="stylesheet" href="{{url_for('static', filename='css/guess_words.css')}}">
+    <script src="{{url_for('static', filename='scripts/scripts.js')}}"></script>
+</head>
+<body>
+    {% if words|length == 0 %}
+        <script>
+            alert('Вы не можете начать игру, поскольку в Вашем словаре нет ни одного слова');
+            window.location.href = '/';
+        </script>
+    {% else %}
+        <div class="container">
+            {% include 'theme.html' %}
+            <h1>Угадай слова на {{lang}}</h1>
+            <hr><br><br><br>
+            <label id="total-dict-words"></label>
+            <button id="show-hide" onclick="showHideListWords(this);">SHOW</button><br><br>
+            <input id="total-words" type="number" value="{{words|length}}" min="1" max="{{words|length}}" oninput="wordsInputChange(this);">
+            <br><br>
+            <input type="checkbox" id="take-end" onclick="clickOnGetWordsFromEndCheckbox(this.checked);">
+            <label for="take-end">Брать с конца</label>
+            <br><br><br>
+
+            <input type="radio" id="EN_RU" name="from_to" checked>
+            <label id="original-lang-label" for="EN_RU">С {{lang}} на русский</label>
+            <br><br>
+            <input type="radio" id="RU_EN" name="from_to">
+            <label id="second-lang-label" for="RU_EN">С русского на {{lang}}</label>
+            <br><br><br>
+
+            <div id="list-words" style="display: none">
+                {% for word in words %}
+                    <div class="word" onclick="setWordChecked({{loop.index0}});">
+                        <input id="word_{{loop.index0}}" class="word-checkbox" type="checkbox" value="{{word.0}}" checked disabled>
+                        <label id="word_label_{{loop.index0}}" style="font-size: 40px" data-trans="{{word.1}}">{{word.0}}</label><br><br>
+                    </div><br>
+                    <script>
+                        addWordsToList(-1, '{{word.0}}', '{{word.1}}', '{{word.2}}', '{{word.3}}', '{{word.4}}');
+                    </script>
+                {% endfor %}
+                <script>
+                    updateStorageListWords('{{lang}}');
+                </script>
+            </div>
+            <br><br><br>
+            <button onclick="startGame('{{lang}}');">Начать игру</button><br><br>
+            <a href=".."><button>Назад</button></a>
+        </div>
+    {% endif %}
+    <script src="{{url_for('static', filename='scripts/theme.js')}}"></script>
+    <script>
+        // setTotalWordsInDict(document.getElementById('dict_choose'));
+    </script>
+</body>
+</html>

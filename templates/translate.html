@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Translate</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/translate.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/index.css') }}">
+</head>
+<body>
+    {% if is_err %}
+        <script>alert('Не удалось перевести введённое Вами слово');</script>
+    {% endif %}
+
+    <div class="container">
+        {% include 'theme.html' %}
+        <h1>Переводчик</h1>
+        <input type="radio" id="google" value="google-api" name="service" onclick="updateServiceForTranslate(this.id);"> <label for="google">GOOGLE API</label>
+        <input type="radio" id="wordhunt" value="wordhunt" name="service" onclick="updateServiceForTranslate(this.id);"> <label for="wordhunt">WORDHUNT</label>
+        <hr><br><br><br>
+
+        {% if is_service_google %}
+            <script>
+                document.getElementById('google').checked = true;
+            </script>
+        {% else %}
+            <script>
+                if ('{{_from}}' == 'EN')
+                    document.getElementById('wordhunt').checked = true;
+                else
+                    document.getElementById('google').checked = true;
+            </script>
+        {% endif %}
+
+        {% if is_word_in_dictionary %}
+            <script>alert('Слово уже в словаре');</script>
+        {% endif %}
+
+        {% if has_word_add %}
+            <script>alert('Слово успешно добавлено в словарь');</script>
+        {% endif %}
+
+        {% include 'special_symbols.html' %}
+
+        <table id="trans-table">
+            <tr>
+                <td><select id="original-lang" onclick="setForeignLang(event);">
+                    {% for foreign_lang in foreign_langs %}
+                        <option>{{foreign_lang}}</option>
+                    {% endfor %}
+                </select></td>
+                <td></td>
+                <td></td>
+            </tr>
+            <tr>
+                <td><h1 id="first-lang">{{_from}}</h1></td>
+                <td><input type="button" value="&lt;&gt;" id="change-langs" onclick="changeLangs();"></td>
+                <td><h1 id="second-lang">{{to}}</h1></td>
+            </tr>
+            <tr>
+                <td><img class="word-say" title="Произнести"
+                         onclick="sayWord(document.getElementById('original-input-word').value, document.getElementById('first-lang').innerHTML);"
+                         src="{{url_for('static', filename='img/say_word_icon.png')}}"></td>
+                <td></td>
+                <td><img class="word-say" title="Произнести"
+                         onclick="sayWord(document.getElementById('read-translate').value, document.getElementById('second-lang').innerHTML);"
+                         src="{{url_for('static', filename='img/say_word_icon.png')}}"></td>
+            </tr>
+            <tr>
+                <td><textarea placeholder="Введите слово..." id="original-input-word" oninput="document.getElementById('read-translate').value=''">{{word}}</textarea></td>
+                <td></td>
+                <td><textarea placeholder="Перевод..." id="read-translate" disabled>{{trans}}</textarea></td>
+            </tr>
+        </table>
+        <br><br><br>
+        <br><br><br>
+
+        <button title="Нажмите <Ctrl>" onclick="checkTextareaInputText();">Перевести</button>
+        <br><br><br>
+        <button onclick="addWordInDatabase();">Добавить в словарь</button>
+        <br><br><br>
+        <a href="/"><button>Назад</button></a>
+    </div>
+    <script>
+        var inpWrd = document.getElementById('original-input-word');
+        inpWrd.focus();
+        inpWrd.addEventListener('keydown', (event) => {
+            console.log(event.code);
+            if (event.code == 'ControlRight')
+                checkTextareaInputText();
+        });
+
+        document.getElementById('original-lang').value = '{{_from}}';
+
+        if ('{{_from}}' != 'EN')
+            document.getElementById('wordhunt').disabled = true;
+
+
+    </script>
+    <script src="{{url_for('static', filename='scripts/scripts.js')}}"></script>
+    <script src="{{url_for('static', filename='scripts/theme.js')}}"></script>
+    <script src="{{url_for('static', filename='scripts/special_symbols.js')}}"></script>
+</body>
+</html>

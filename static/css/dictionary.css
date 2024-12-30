@@ -1,0 +1,49 @@
+body {
+    background: black;
+}
+
+.container {
+    color: red;
+    text-align: center;
+}
+
+#words-table {
+    width: 100%;
+    text-align: center;
+}
+
+.word-card {
+    width: 50%;
+    color: Orange;
+    background: PaleGreen;
+    font-family: 'Times New Roman', 'Verdana', sans-serif;
+    font-size: 40px;
+    margin-right: auto;
+    margin-left: auto;
+    border: 5px solid green;
+    border-radius: 20px;
+}
+
+.date-to-add {
+    color: DarkRed;
+}
+
+.word {
+    cursor: pointer;
+}
+
+.transcription {
+    color: DarkRed;
+}
+
+#search-input {
+    width: 20%;
+    font-size: 25px;
+    vertical-align: middle;
+}
+
+#search-img {
+    width: 40px;
+    height: 40px;
+    vertical-align: middle;
+}

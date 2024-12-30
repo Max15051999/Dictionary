@@ -1,0 +1,9 @@
+#statistic-table {
+    margin: auto;
+    color: Black;
+    font-size: 40px;
+    border-spacing: 20px 5rem;
+    background: Wheat;
+    border: 5px solid Orange;
+    border-radius: 20px;
+}

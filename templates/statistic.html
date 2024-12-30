@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Statistic</title>
+    <link rel="stylesheet" href="{{url_for('static', filename='css/index.css')}}">
+    <link rel="stylesheet" href="{{url_for('static', filename='css/statistic.css')}}">
+</head>
+<body>
+    <div class="container">
+        {% include 'theme.html' %}
+        <h1>Статистика</h1>
+        <hr><br><br><br>
+
+        <table id="statistic-table">
+            <tr>
+                <td>Всего вопросов</td>
+                <td>{{total}}</td>
+            </tr>
+            <tr>
+                <td>Отвечено верно</td>
+                <td>{{right}}</td>
+            </tr>
+            <tr>
+                <td id="wrong-ans">Отвечено неверно</td>
+                <td>{{wrong}}</td>
+            </tr>
+            <tr>
+                <td>Процент</td>
+                <td>{{percent}}%</td>
+            </tr>
+        </table>
+        <hr><br><br><br>
+        <a href="../../../../"><button title="Нажмите <Enter>">Начать заново</button></a><br><br>
+        <a href="../../../../../" title="Нажмите <Q>"><button>Назад</button></a>
+    </div>
+    <script>
+        var wrongAnswers = document.getElementById('wrong-ans');
+
+        if ({{wrong}} > 0) {
+            listWords = JSON.parse(sessionStorage.getItem('words')).words;
+
+            wrongAnswers.style.color = 'Red';
+            wrongAnswers.style.cursor = 'pointer';
+            wrongAnswers.title = 'Повторить с этими словами';
+            wrongAnswers.onclick = () => {
+                listWords = listWords.filter(wordInfo => wordInfo.is_wrong_answer);
+                sessionStorage.words = JSON.stringify({words: listWords});
+                window.location.href = '../../../../';
+            }
+        } else {
+            wrongAnswers.style.color = 'Green';
+        }
+
+        document.body.addEventListener('keydown', (event) => {
+            var link;
+
+            switch(event.code) {
+                case 'Enter':
+                    link = '../../../../';
+                    break;
+                case 'KeyQ':
+                    link = '../../../../../';
+                    break;
+                default:
+                    return;
+            };
+            window.location.href = link;
+            }, false);
+    </script>
+    <script src="{{url_for('static', filename='scripts/theme.js')}}"></script>
+</body>
+</html>

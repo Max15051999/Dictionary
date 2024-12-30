@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{{title}}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/index.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/add_change_word.css') }}">
+</head>
+<body>
+    <div class="container">
+        {% include 'theme.html' %}
+        <h1>{{title}}</h1>
+        <hr><br><br><br>
+
+        {% if msg %}
+            <script>alert('{{msg}}');</script>
+        {% endif %}
+
+        {% include 'special_symbols.html' %}
+
+        <form action="." method="post">
+            <input type="number" value="{{word_id}}" hidden="hidden">
+
+            <label class="label" for="original-input-word">Слово на
+                <select id="langs-selector" name="lang">
+                    {% for dict in my_dicts  %}
+                        <option>{{dict}}</option>
+                    {% endfor %}
+                </select>*</label><br><br>
+            <input class="input" id="original-input-word" name="original_word" type="text" value="{{word_en}}" placeholder="Введите слово..." required>
+            <br><br><br>
+            <label class="label" for="input_ru">Перевод на русский*</label><br><br>
+            <input class="input" id="input_ru" name="word_ru" type="text" value="{{word_ru}}" placeholder="Введите слово..." required>
+            <br><br><br>
+            <label class="label" for="transc">Транскрипция</label><br><br>
+            <input class="input" id="transc" name="transcription" type="text" value="{{transcription if transcription != 'ES' else ''}}" placeholder="Введите транскрипцию...">
+            <br><br><br><br><br>
+            <button type="submit">{{title}}</button>
+        </form>
+        <br><br><br>
+        <a href="{{href_back}}"><button>Назад</button></a>
+    </div>
+    <script src="{{url_for('static', filename='scripts/theme.js')}}"></script>
+    <script src="{{url_for('static', filename='scripts/special_symbols.js')}}"></script>
+
+    {% if lang %}
+        <script>
+            document.getElementById('langs-selector').value = '{{lang}}';
+        </script>
+    {% endif %}
+</body>
+</html>

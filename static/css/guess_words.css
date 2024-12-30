@@ -1,0 +1,41 @@
+label {
+    font-size: 20px;
+}
+
+img {
+    width: 5%;
+    height: 5%;
+    cursor: pointer;
+}
+
+#total-words {
+    width: 10%;
+    font-size: 20px;
+}
+
+#list-words {
+    text-align: center;
+    font-size: 40px;
+}
+
+.word {
+    width: 40%;
+    margin-left: 30%;
+    font-size: 40px;
+    color: SaddleBrown;
+    background: BurlyWood;
+    border: 5px solid DarkCyan;
+    border-radius: 10px;
+}
+
+#show-hide {
+    width: 80px;
+    background: Silver;
+    font-size: 20px;
+}
+
+.word-checkbox {
+    width: 60px;
+    height: 60px;
+    vertical-align: middle;
+}

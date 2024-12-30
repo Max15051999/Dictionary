@@ -1,0 +1,13 @@
+body {
+    background: black;
+}
+
+.container {
+    color: red;
+    text-align: center;
+}
+
+#dicts-table {
+    width: 100%;
+    text-align: center;
+}

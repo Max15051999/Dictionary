@@ -1,0 +1,8 @@
+<head>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/up_down_scroll.css') }}">
+</head>
+<div id="up-down-scroll">
+    <img class="up-down-btn" src="{{url_for('static', filename='img/up_arrow_icon.png')}}" onclick="window.scrollTo({top: 0, behavior: 'smooth'});">
+    <br><br><br>
+    <img class="up-down-btn" src="{{url_for('static', filename='img/down_arrow_icon.png')}}" onclick="window.scrollTo({top: document.body.scrollHeight, behavior: 'smooth'});">
+</div>

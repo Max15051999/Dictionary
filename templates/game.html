@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Игра</title>
+    <link rel="stylesheet" href="{{url_for('static', filename='css/index.css')}}">
+    <link rel="stylesheet" href="{{url_for('static', filename='css/game.css')}}">
+    <script src="{{url_for('static', filename='scripts/scripts.js')}}"></script>
+    <script>
+        var sourceLang = sessionStorage.getItem('source_lang');
+    </script>
+</head>
+<body>
+    <div class="container">
+        {% include 'theme.html' %}
+        <h1>Game ({{lang}})</h1>
+        <hr><br><br><br>
+        <label id="current_total" style="font-size: 30px;"></label><br><br>
+        <img id="question-status" src="{{url_for('static', filename='img/thinking_icon.png')}}"/><br>
+
+        {% include 'special_symbols.html' %}
+
+        <label id="right-answer" style="color: green; font-size: 30px;"></label>
+        <br><br><br>
+        <div class="word-for-translate">
+            <h2 title="Произнести (<Ctrl>)" id="original-word" onclick="sayWord(`${this.innerHTML}`, sourceLang)" style="cursor: pointer;">ORIGINAL</h2>
+            <h3 id="transcription-word">TRANSCRIPTION</h3>
+            <input id="original-input-word" type="text" title="Введите перевод" placeholder="Перевод..."><br><br>
+            <button id="check-answer" onclick="checkTranslateWord();">Готово</button>
+        </div><br><br><br><br><br><br>
+        <button onclick="checkBack();">Назад</button>
+        <script>
+            function checkBack() {
+                if (confirm('Вы действительно хотите выйти? Весь прогресс будет утерян'))
+                    window.location.href = '..';
+            }
+
+            var originalWord = document.getElementById('original-word');
+            var transcriptionWord = document.getElementById('transcription-word');
+            // console.log('GET ITEM: ' + sourceLang);
+
+            if (sourceLang == 'RU')
+                transcriptionWord.hidden = true;
+
+            // if (sessionStorage.getItem('take_from_end') != '1')
+            // shuffle();
+
+            setOriginalWord(sourceLang);
+            document.getElementById('current_total').innerHTML = `1/${listWords.length}`;
+
+            var translateWordInput = document.getElementById('original-input-word');
+            translateWordInput.focus();
+            translateWordInput.addEventListener('keydown', (event) => {
+                switch (event.code) {
+                    case 'Enter':
+                        checkTranslateWord();
+                        break;
+                    case 'ControlRight':
+                        sayWord(`${document.getElementById('original-word').innerHTML}`, sourceLang);
+                        break;
+                }
+            });
+        </script>
+    </div>
+    <script src="{{url_for('static', filename='scripts/theme.js')}}"></script>
+    <script src="{{url_for('static', filename='scripts/special_symbols.js')}}"></script>
+</body>
+</html>
