@@ -17,21 +17,23 @@ def connect_to_db(db_name: str = config.PATH_TO_DB) -> database.DB:
 	db = database.DB(db_name)
 	return db
 
-def get_translate_by_word(word: str, foreign_lang: str, is_part_word: bool) -> Union[Tuple[str, str], None]:
+def get_translate_by_word(word: str, first_lang: str, is_part_word: bool, second_lang: str = None) -> Union[Tuple[str, str], None]:
 	db = connect_to_db()
 
 	word = word.capitalize()
 	is_first_part = len(word) == 1
 
-	if foreign_lang == ForeignLang.ENGLISH.value:
+	if first_lang == ForeignLang.ENGLISH.value:
 		query = queries.GET_TRANSLATE_AND_TRANSCRIPTION_BY_ENGLISH_WORD(is_part_word, is_first_part)
-		params = [word, foreign_lang]
-	elif foreign_lang == ForeignLang.DEUTSCH.value:
+		params = [word, first_lang]
+	elif first_lang == ForeignLang.DEUTSCH.value:
 		query = queries.GET_TRANSLATE_AND_TRANSCRIPTION_BY_DEUTSCH_WORD(is_part_word, is_first_part)
-		params = [word, foreign_lang]
-	else:
+		params = [word, first_lang]
+	elif first_lang == config.RU_LANG_ALIAS:
 		query = queries.GET_TRANSLATE_AND_TRANSCRIPTION_BY_RUSSIAN_WORD(is_part_word, is_first_part)
-		params = [word]
+		params = [word, second_lang]
+	else:
+		return None
 
 	translate = db.query_execute(query, params=tuple(params), is_fetch_one=not is_part_word, is_fetch_all=is_part_word)
 
@@ -72,11 +74,11 @@ def search_words(word_part: str, lang: str) -> List[Tuple[int, str, str, str, in
 	db = connect_to_db()
 
 	is_en = False
-	words = get_translate_by_word(word_part, foreign_lang=lang, is_part_word=True)
+	words = get_translate_by_word(word_part, first_lang=lang, is_part_word=True)
 
 	if not words:
 		is_en = True
-		words = get_translate_by_word(word_part, foreign_lang=config.RU_LANG_ALIAS, is_part_word=True)
+		words = get_translate_by_word(word_part, first_lang=config.RU_LANG_ALIAS, second_lang=lang, is_part_word=True)
 
 	if not words:
 		return []

@@ -124,7 +124,7 @@ def get_translate(word: str, _from: str, to: str):
 
   is_service_google = help_funcs.open_json(config.SERVICE_JSON_NAME) == config.GOOGLE_SEVICE_NAME
 
-  translate_db = help_funcs.get_translate_by_word(word, _from, is_part_word=False)
+  translate_db = help_funcs.get_translate_by_word(word, first_lang=_from, second_lang=to, is_part_word=False)
 
   if translate_db is None:
     if is_service_google:

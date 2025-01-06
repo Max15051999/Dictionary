@@ -17,7 +17,7 @@ GET_TRANSLATE_AND_TRANSCRIPTION_BY_DEUTSCH_WORD = lambda is_word_part, is_first_
 {config.TABLE_NAME} WHERE original LIKE {'?' if not is_word_part else '? || "%"' if is_first_letter else '"%" || ? || "%"'} AND lang = ?; """
 
 GET_TRANSLATE_AND_TRANSCRIPTION_BY_RUSSIAN_WORD = lambda is_word_part, is_first_letter=False: f""" SELECT original, transcription FROM 
-{config.TABLE_NAME} WHERE translate LIKE {'?' if not is_word_part else '? || "%"' if is_first_letter else '"%" || ? || "%"'};"""
+{config.TABLE_NAME} WHERE translate LIKE {'?' if not is_word_part else '? || "%"' if is_first_letter else '"%" || ? || "%"'} AND lang = ?;"""
 
 GET_DICTIONARIES = f""" SELECT DISTINCT lang FROM {config.TABLE_NAME} """
 
