@@ -17,7 +17,7 @@ def example():
   # db = help_funcs.connect_to_db()
   # forgotten_words = db.query_execute(f""" SELECT * FROM {config.TABLE_NAME} WHERE is_forgotten; """, is_fetch_all=True)
   # print(forgotten_words)
-  # db.query_execute(f""" ALTER TABLE {config.TABLE_NAME} ADD COLUMN IF NOT EXISTS is_forgotten integer default false; """)
+  # db.query_execute(f""" ALTER TABLE {config.TABLE_NAME} ADD COLUMN is_forgotten integer default false; """)
   return render_template('test.html')
 
 
