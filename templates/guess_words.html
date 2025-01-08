@@ -40,7 +40,7 @@
                         <label id="word_label_{{loop.index0}}" style="font-size: 40px" data-trans="{{word.1}}">{{word.0}}</label><br><br>
                     </div><br>
                     <script>
-                        addWordsToList(-1, '{{word.0}}', '{{word.1}}', '{{word.2}}', '{{word.3}}', '{{word.4}}');
+                        addWordsToList(-1, '{{word.0}}', '{{word.1}}', '{{word.2}}', '{{word.3}}', '{{word.4}}', {{word.5}}, {{word.6}});
                     </script>
                 {% endfor %}
                 <script>
@@ -48,7 +48,8 @@
                 </script>
             </div>
             <br><br><br>
-            <button onclick="startGame('{{lang}}');">Начать игру</button><br><br>
+            <button onclick="startGame('{{lang}}');">Начать игру со всеми словами</button><br><br>
+            <button onclick="startGame('{{lang}}', true);">Начать игру с забывающимися словами</button><br><br>
             <a href=".."><button>Назад</button></a>
         </div>
     {% endif %}

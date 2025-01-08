@@ -246,17 +246,19 @@ function setWordChecked(wordId) {
 //    sessionStorage.words = JSON.stringify({words: []});
 
 var listWords = [];
-function addWordsToList(wordId = -1, wordEn, wordRu, _transcription, _lang, date) {
+function addWordsToList(wordId = -1, wordEn, wordRu, _transcription, _lang, date, _is_forgotten, _id) {
     var _timestamp = new Date(date).getTime() / 1000;
     // console.log('TIMESTAMP: ' + timestamp);
     var wordInfo = {
+        id: _id,
         original: wordEn,
         translate: wordRu,
         transcription: _transcription,
         lang: _lang,
         is_checked: true,
         is_wrong_answer: false,
-        timestamp: _timestamp
+        timestamp: _timestamp,
+        is_forgotten: _is_forgotten
     };
 
     if (wordId != - 1)
@@ -398,25 +400,42 @@ function updateStorageListWords(sourceLang = '', takeFromEnd = false) {
     sessionStorage.setItem('take_from_end', takeFromEnd ? '1' : '0');
 }
 
-function startGame(foreignLang) {
-    var totalWords = +document.getElementById('total-words').value;
+function startGame(foreignLang, is_forgotten=false) {
+    var lang = document.getElementById('EN_RU').checked ? foreignLang : 'RU';
 
-    if (totalWords <= 0 || totalWords > listWords.length) {
-        alert('Задайте корректное количество слов');
-    } else {
-        var lang = document.getElementById('EN_RU').checked ? foreignLang : 'RU';
-        var takeFromEnd = false;
+    if (is_forgotten) {
 
-        if (document.getElementById('take-end').checked && listWords.length > 1) {
-            // listWords = listWords.reverse();
-            takeFromEnd = true;
+        var forgottenWords = listWords.filter(wordInfo => wordInfo.is_forgotten == 1);
+
+        if (forgottenWords.length == 0) {
+            alert('У Вас нет забывающихся слов');
+            return;
         }
 
+        listWords = forgottenWords;
         shuffle(listWords);
-        listWords = listWords.filter(wordInfo => wordInfo.is_checked);
-        updateStorageListWords(lang, takeFromEnd);
-        // sessionStorage.allWords = JSON.stringify({allWords: listWords});
+        updateStorageListWords(lang, false);
         window.location.href = window.location.href + 'game/';
+
+    } else {
+        var totalWords = +document.getElementById('total-words').value;
+
+        if (totalWords <= 0 || totalWords > listWords.length) {
+            alert('Задайте корректное количество слов');
+        } else {
+            var takeFromEnd = false;
+
+            if (document.getElementById('take-end').checked && listWords.length > 1) {
+                // listWords = listWords.reverse();
+                takeFromEnd = true;
+            }
+
+            shuffle(listWords);
+            listWords = listWords.filter(wordInfo => wordInfo.is_checked);
+            updateStorageListWords(lang, takeFromEnd);
+            // sessionStorage.allWords = JSON.stringify({allWords: listWords});
+            window.location.href = window.location.href + 'game/';
+        }
     }
 }
 
@@ -539,7 +558,6 @@ function startStopSayingAllWords() {
 
         sayingWordsImg.src = '/static/img/stop_saying_words.png';
         isSaying = true;
-        console.log(wordsForSpeaking);
         speakWords(0, sayingWordsImg, wordsForSpeaking.length > 0 ? wordsForSpeaking : listWords);
     } else {
         sayingWordsImg.src = '/static/img/start_saying_words.png';

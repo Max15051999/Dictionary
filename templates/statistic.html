@@ -32,9 +32,29 @@
         </table>
         <hr><br><br><br>
         <a href="../../../../"><button title="Нажмите <Enter>">Начать заново</button></a><br><br>
+
+        {% if wrong > 0 %}
+            <button onclick="updateForgottenWords(this);">Добавить в забывающиеся</button><br><br>
+        {% endif %}
+
         <a href="../../../../../" title="Нажмите <Q>"><button>Назад</button></a>
     </div>
     <script>
+        function updateForgottenWords(btn) {
+            var wrongIds = listWords.filter(wordInfo => wordInfo.is_wrong_answer).map(wordInfo => wordInfo.id);
+
+            fetch(`.`, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({wrongIds: wrongIds})
+            });
+
+            alert('Неверно отвеченные слова обновлены');
+            btn.disabled = true;
+        }
+
         var wrongAnswers = document.getElementById('wrong-ans');
 
         if ({{wrong}} > 0) {

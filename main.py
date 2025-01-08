@@ -1,3 +1,4 @@
+from typing import List
 from flask import Flask, render_template, request
 import requests
 from bs4 import BeautifulSoup
@@ -13,6 +14,10 @@ app = Flask(__name__)
 
 @app.route('/test/')
 def example():
+  # db = help_funcs.connect_to_db()
+  # forgotten_words = db.query_execute(f""" SELECT * FROM {config.TABLE_NAME} WHERE is_forgotten; """, is_fetch_all=True)
+  # print(forgotten_words)
+  # db.query_execute(f""" ALTER TABLE {config.TABLE_NAME} ADD COLUMN IF NOT EXISTS is_forgotten integer default false; """)
   return render_template('test.html')
 
 
@@ -24,46 +29,49 @@ def index():
   return render_template('index.html')
 
 
-@app.route('/translate/', methods = ['GET'])
+@app.route('/translate/', methods=['GET'])
 def translate(is_word_in_dictionary: bool = False, has_word_add: bool = False, lang_from: str = config.EN_LANG_ALIAS,
-              lang_to: str = config.RU_LANG_ALIAS):
-
+        lang_to: str = config.RU_LANG_ALIAS):
   service_name = help_funcs.open_json(config.SERVICE_JSON_NAME)
   is_service_google = service_name == config.GOOGLE_SEVICE_NAME
 
   return render_template('translate.html', is_service_google=is_service_google,
-                         is_word_in_dictionary=is_word_in_dictionary, has_word_add=has_word_add,
-                         _from=lang_from, to=lang_to, foreign_langs=[foreign_lang.value for foreign_lang in ForeignLang])
+               is_word_in_dictionary=is_word_in_dictionary, has_word_add=has_word_add,
+               _from=lang_from, to=lang_to,
+               foreign_langs=[foreign_lang.value for foreign_lang in ForeignLang])
 
 
-@app.route('/dictionaries/', methods = ['GET'])
+@app.route('/dictionaries/', methods=['GET'])
 def my_dictionaries():
   db = help_funcs.connect_to_db()
   my_dicts = db.query_execute(queries.GET_DICTIONARIES, is_fetch_all=True)
   return render_template('dictionary_type.html', my_dicts=my_dicts, title='Мои словари',
-                         next_page='dictionary')
+               next_page='dictionary')
 
-@app.route('/dictionary/<dictionary_lang>/', methods = ['GET'])
+
+@app.route('/dictionary/<dictionary_lang>/', methods=['GET'])
 def show_dictionary(dictionary_lang: str):
   db = help_funcs.connect_to_db()
 
-  words = db.query_execute(queries.SELECT_ALL_WORDS, params=(dictionary_lang, ), is_fetch_all=True)
+  words = db.query_execute(queries.SELECT_ALL_WORDS, params=(dictionary_lang,), is_fetch_all=True)
 
-  return render_template('dictionary.html', words=words, dictionary_lang=dictionary_lang,  href_back='/dictionaries/')
+  return render_template('dictionary.html', words=words, dictionary_lang=dictionary_lang, href_back='/dictionaries/')
 
 
-@app.route('/guess_words/', methods = ['GET'])
+@app.route('/guess_words/', methods=['GET'])
 def show_dicts_for_guess_words():
   db = help_funcs.connect_to_db()
   my_dicts = db.query_execute(queries.GET_DICTIONARIES, is_fetch_all=True)
   return render_template('dictionary_type.html', my_dicts=my_dicts, title='Словари для угадывания слов',
-                         is_game=True, next_page='guess_words')
+               is_game=True, next_page='guess_words')
+
 
 @app.route('/guess_words/<lang>/', methods=['GET'])
 def guess_words(lang: str):
   db = help_funcs.connect_to_db()
 
-  words_for_guess = db.query_execute(queries.GET_WORDS_OF_CONCRETE_LANG_INFO_FOR_GUESS_GAME, params=(lang,), is_fetch_all=True)
+  words_for_guess = db.query_execute(queries.GET_WORDS_OF_CONCRETE_LANG_INFO_FOR_GUESS_GAME, params=(lang,),
+                     is_fetch_all=True)
 
   # lang_words_dct = {}
   #
@@ -84,19 +92,31 @@ def game(lang: str):
   return render_template('game.html', lang=lang)
 
 
-@app.route('/guess_words/<lang>/game/statistic/<total_words>/<right_answers_count>/<wrong_answers_count>/', methods=['GET'])
+@app.route('/guess_words/<lang>/game/statistic/<total_words>/<right_answers_count>/<wrong_answers_count>/',
+       methods=['GET', 'POST'])
 def statistic(lang: str, total_words: str, right_answers_count: str, wrong_answers_count: str):
-  percent = None
+  total_words_num, right_answers_count_num, wrong_answers_count_num, percent = 0, 0, 0, 0.0
 
-  if total_words.isdigit() and right_answers_count.isdigit() and wrong_answers_count.isdigit():
-    total_words = int(total_words)
-    right_answers_count = int(right_answers_count)
-    wrong_answers_count = int(wrong_answers_count)
+  if request.method == 'GET':
 
-    percent = round((right_answers_count * 100) / total_words, 2)
+    if total_words.isdigit() and right_answers_count.isdigit() and wrong_answers_count.isdigit():
+      total_words_num = int(total_words)
+      right_answers_count_num = int(right_answers_count)
+      wrong_answers_count_num = int(wrong_answers_count)
 
-  return render_template('statistic.html', total=total_words,
-                         right=right_answers_count, wrong=wrong_answers_count, percent=percent)
+      percent = round((right_answers_count_num * 100) / total_words_num, 2)
+
+  else:
+
+    data: dict = json.loads(request.data.decode())
+    wrong_ids: List[int] = data['wrongIds']
+
+    db = help_funcs.connect_to_db()
+    db.query_execute(queries.SET_ALL_WORDS_IS_FORGOTTEN_NO, params=(lang,))
+    db.query_execute(queries.SET_IS_FORGOTTEN_YES, params=[(wrong_id,) for wrong_id in wrong_ids], is_ext=True)
+
+  return render_template('statistic.html', total=total_words_num,
+               right=wrong_answers_count_num, wrong=wrong_answers_count_num, percent=percent)
 
 
 @app.route('/dictionary/<lang>/download/', methods=['GET'])
@@ -112,7 +132,7 @@ def upload_dictionary(lang: str):
   return render_template('download_upload_dictionary.html', title=title, lang=lang)
 
 
-@app.route('/translate/<word>/<_from>/<to>/', methods = ['GET'])
+@app.route('/translate/<word>/<_from>/<to>/', methods=['GET'])
 def get_translate(word: str, _from: str, to: str):
   # print('WORD:', word)
   # print('FROM', _from)
@@ -176,7 +196,8 @@ def get_translate(word: str, _from: str, to: str):
               except AttributeError:
                 translate_word = russian_content.find_all('div', class_='block similar_words')[-1].text
 
-            transcription = soup.find('div', class_='trans_sound').find('div', id='uk_tr_sound').find('span').text
+            transcription = soup.find('div', class_='trans_sound').find('div', id='uk_tr_sound').find(
+              'span').text
 
             word += ' ' + transcription
         else:
@@ -210,13 +231,12 @@ def get_translate(word: str, _from: str, to: str):
       translate_word += translate_db[1]
 
   return render_template('translate.html', _from=_from, to=to,
-                         word=word, trans=translate_word, is_err=is_err, is_service_google=is_service_google,
-                         foreign_langs=[foreign_lang.value for foreign_lang in ForeignLang])
+               word=word, trans=translate_word, is_err=is_err, is_service_google=is_service_google,
+               foreign_langs=[foreign_lang.value for foreign_lang in ForeignLang])
 
 
 @app.route('/add_new_word/<word1>/<word2>/<first_lang>/<second_lang>/')
 def add_word_in_db(word1: str, word2: str, first_lang: str, second_lang: str):
-
   original_word = (word2 if first_lang == config.RU_LANG_ALIAS else word1).capitalize()
   russian_word = (word1 if first_lang == config.RU_LANG_ALIAS else word2).capitalize()
 
@@ -230,7 +250,8 @@ def add_word_in_db(word1: str, word2: str, first_lang: str, second_lang: str):
   if help_funcs.check_if_word_in_db(original_word, first_lang):
     return translate(is_word_in_dictionary=True)
 
-  help_funcs.add_word_in_db(original_word, russian_word, transcription, first_lang if first_lang != config.RU_LANG_ALIAS else second_lang)
+  help_funcs.add_word_in_db(original_word, russian_word, transcription,
+                first_lang if first_lang != config.RU_LANG_ALIAS else second_lang)
 
   return translate(has_word_add=True, lang_from=first_lang, lang_to=second_lang)
 
@@ -255,7 +276,8 @@ def delete_word():
   return show_dictionary(lang)
 
 
-@app.route('/dictionary/<dictionary_lang>/change/<word_id>/<word_en>/<word_ru>/<transcription>/', methods = ['GET', 'POST'])
+@app.route('/dictionary/<dictionary_lang>/change/<word_id>/<word_en>/<word_ru>/<transcription>/',
+       methods=['GET', 'POST'])
 def change_word(dictionary_lang: str, word_id: str, word_en: str, word_ru: str, transcription: str):
   title = 'Изменить слово'
   word_id = int(word_id)
@@ -277,9 +299,9 @@ def change_word(dictionary_lang: str, word_id: str, word_en: str, word_ru: str, 
       msg = 'Ошибка изменения слова'
 
   return render_template('add_change_word.html', title=title, msg=msg,
-                         word_id=word_id, word_en=word_en, word_ru=word_ru,
-                         transcription=transcription, my_dicts=my_dicts, lang=lang if lang else dictionary_lang,
-                         href_back=f'/dictionary/{dictionary_lang}/')
+               word_id=word_id, word_en=word_en, word_ru=word_ru,
+               transcription=transcription, my_dicts=my_dicts, lang=lang if lang else dictionary_lang,
+               href_back=f'/dictionary/{dictionary_lang}/')
 
 
 @app.route('/add_new_word/', methods=['GET', 'POST'])
@@ -300,7 +322,7 @@ def add_new_word():
       msg = 'Слово успешно добавлено в словарь'
 
   return render_template('add_change_word.html', title=title,
-                         msg=msg, my_dicts=[lang.value for lang in ForeignLang], lang=lang, href_back='/')
+               msg=msg, my_dicts=[lang.value for lang in ForeignLang], lang=lang, href_back='/')
 
 
 @app.route('/dictionary/<lang>/search/<word_part>/', methods=['GET'])
@@ -314,18 +336,18 @@ def search_word_card(lang: str, word_part: str):
     is_err = True
 
   return render_template('dictionary.html', words=words,
-                         href_back='../../', is_err=is_err, is_search=is_search, dictionary_lang=lang)
+               href_back='../../', is_err=is_err, is_search=is_search, dictionary_lang=lang)
 
 
-@app.route('/update_service/<service>/<first_lang>/<second_lang>/', methods = ['GET'])
+@app.route('/update_service/<service>/<first_lang>/<second_lang>/', methods=['GET'])
 def update_service(service: str, first_lang: str, second_lang: str):
   help_funcs.open_json(config.SERVICE_JSON_NAME, mode='w', service_name=service)
   is_service_google = service == config.GOOGLE_SEVICE_NAME
   return render_template('translate.html', is_service_google=is_service_google, _from=first_lang,
-                         to=second_lang, foreign_langs=[foreign_lang.value for foreign_lang in ForeignLang])
+               to=second_lang, foreign_langs=[foreign_lang.value for foreign_lang in ForeignLang])
 
 
-@app.route('/upload_file/<lang>/', methods = ['POST'])
+@app.route('/upload_file/<lang>/', methods=['POST'])
 def upload_file(lang: str):
   file = request.files['words']
   delimiter = request.form['delimiter']

@@ -27,7 +27,8 @@ TABLE_FIELDS = {
     'translate' : 'text',
 	'transcription' : 'varchar(50)',
 	'lang' : 'varchar(2)',
-	'date_to_add' : 'datetime default current_timestamp'
+	'date_to_add' : 'datetime default current_timestamp',
+	'is_forgotten' : 'integer default false'
   }
 
 RU_LANG_ALIAS = 'RU'
