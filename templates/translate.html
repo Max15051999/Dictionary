@@ -43,7 +43,7 @@
 
         <table id="trans-table">
             <tr>
-                <td><select id="original-lang" onclick="setForeignLang(event);">
+                <td><select id="original-lang" onchange="setForeignLang(event);">
                     {% for foreign_lang in foreign_langs %}
                         <option>{{foreign_lang}}</option>
                     {% endfor %}
