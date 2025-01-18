@@ -512,18 +512,20 @@ function checkTranslateWord() {
 
         var imgUrl;
 
+        rightAnswerLabel.innerHTML = originalWord;
+
         if (isAnswerRight) {
             // rightAnswersCount++;
-            console.log(wordIndex);
-            console.log('IS RIGHT:', listWords[wordIndex - 1].is_wrong_answer);
+//            console.log(wordIndex);
+//            console.log('IS RIGHT:', listWords[wordIndex - 1].is_wrong_answer);
             if (listWords[wordIndex - 1].is_wrong_answer == null)
                 listWords[wordIndex - 1].is_wrong_answer = false;
             // imgUrl = '/static/img/right_answer_icon.png';
             questionStatusImg.src = '/static/img/right_answer_icon.png';
         } else {
             // wrongAnswersCount++;
-            rightAnswerLabel.innerHTML = originalWord;
-            console.log(wordIndex)
+            // rightAnswerLabel.innerHTML = originalWord;
+            // console.log(wordIndex)
             listWords[wordIndex - 1].is_wrong_answer = true;
             // imgUrl = '/static/img/wrong_answer_icon.png';
             questionStatusImg.src = '/static/img/wrong_answer_icon.png';
