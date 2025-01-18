@@ -256,7 +256,7 @@ function addWordsToList(wordId = -1, wordEn, wordRu, _transcription, _lang, date
         transcription: _transcription,
         lang: _lang,
         is_checked: true,
-        is_wrong_answer: false,
+        is_wrong_answer: null,
         timestamp: _timestamp,
         is_forgotten: _is_forgotten
     };
@@ -472,15 +472,15 @@ function setOriginalWord(lang) {
     listWords = JSON.parse(sessionStorage.getItem('words')).words;
     // console.log(listWords);
 
-    var wordInfo = listWords[wordIndex++];
+    var wordInfo = listWords[wordIndex];
 
     originalWord.innerHTML = wordInfo[lang != 'RU' ? 'original' : 'translate'];
     // console.log(lang)
     transcriptionWord.innerHTML = wordInfo.transcription ? wordInfo.transcription : '';
 }
 
-var rightAnswersCount = 0;
-var wrongAnswersCount = 0;
+//var rightAnswersCount = 0;
+//var wrongAnswersCount = 0;
 function checkTranslateWord() {
     listWords = JSON.parse(sessionStorage.getItem('words')).words;
     // var translateWordInput = document.getElementById('translate-input');
@@ -513,17 +513,26 @@ function checkTranslateWord() {
         var imgUrl;
 
         if (isAnswerRight) {
-            rightAnswersCount++;
-            listWords[wordIndex - 1].is_wrong_answer = false;
-            imgUrl = '/static/img/right_answer_icon.png';
+            // rightAnswersCount++;
+            console.log(wordIndex);
+            console.log('IS RIGHT:', listWords[wordIndex - 1].is_wrong_answer);
+            if (listWords[wordIndex - 1].is_wrong_answer == null)
+                listWords[wordIndex - 1].is_wrong_answer = false;
+            // imgUrl = '/static/img/right_answer_icon.png';
+            questionStatusImg.src = '/static/img/right_answer_icon.png';
         } else {
-            wrongAnswersCount++;
+            // wrongAnswersCount++;
             rightAnswerLabel.innerHTML = originalWord;
+            console.log(wordIndex)
             listWords[wordIndex - 1].is_wrong_answer = true;
-            imgUrl = '/static/img/wrong_answer_icon.png';
+            // imgUrl = '/static/img/wrong_answer_icon.png';
+            questionStatusImg.src = '/static/img/wrong_answer_icon.png';
+            translateWordInput.value = '';
+            sessionStorage.words = JSON.stringify({words: listWords});
+            return;
         }
         sessionStorage.words = JSON.stringify({words: listWords});
-        questionStatusImg.src = imgUrl;
+        // questionStatusImg.src = imgUrl;
 
         setTimeout(() => {
             rightAnswerLabel.innerHTML = '';
@@ -531,8 +540,15 @@ function checkTranslateWord() {
                 document.getElementById('current_total').innerHTML = `${wordIndex + 1}/${listWords.length}`;
                 questionStatusImg.src = '/static/img/thinking_icon.png';
                 setOriginalWord(sourceLang);
+                wordIndex++;
                 translateWordInput.value = '';
             } else {
+                var rightAnswersCount = 0;
+
+                listWords.forEach(word => !word.is_wrong_answer ? ++rightAnswersCount : rightAnswersCount);
+
+                var wrongAnswersCount = listWords.length - rightAnswersCount;
+
                 window.location.href = `${window.location.href}statistic/${wordIndex}/${rightAnswersCount}/${wrongAnswersCount}/`
                 // sessionStorage.words = JSON.stringify({words: []});
             }

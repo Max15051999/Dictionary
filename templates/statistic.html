@@ -31,15 +31,30 @@
             </tr>
         </table>
         <hr><br><br><br>
-        <a href="../../../../"><button title="Нажмите <Enter>">Начать заново</button></a><br><br>
+        <button onclick="restartGame();" title="Нажмите <Enter>">Начать заново</button><br><br>
 
         {% if wrong > 0 %}
             <button onclick="updateForgottenWords(this);">Добавить в забывающиеся</button><br><br>
         {% endif %}
 
-        <a href="../../../../../" title="Нажмите <Q>"><button>Назад</button></a>
+        <button title="Нажмите Q" onclick="back();">Назад</button>
     </div>
     <script>
+        var listWords = JSON.parse(sessionStorage.getItem('words')).words;
+
+        function back() {
+            window.location.href = '../../../../../';
+        }
+
+        function restartGame() {
+            for (var i = listWords.length - 1; i >= 0; i--)
+                listWords[i].is_wrong_answer = null;
+
+            sessionStorage.words = JSON.stringify({words: listWords});
+
+            window.location.href = '../../../../';
+        }
+
         function updateForgottenWords(btn) {
             var wrongIds = listWords.filter(wordInfo => wordInfo.is_wrong_answer).map(wordInfo => wordInfo.id);
 
@@ -58,34 +73,34 @@
         var wrongAnswers = document.getElementById('wrong-ans');
 
         if ({{wrong}} > 0) {
-            listWords = JSON.parse(sessionStorage.getItem('words')).words;
+            // listWords = JSON.parse(sessionStorage.getItem('words')).words;
 
             wrongAnswers.style.color = 'Red';
             wrongAnswers.style.cursor = 'pointer';
             wrongAnswers.title = 'Повторить с этими словами';
             wrongAnswers.onclick = () => {
                 listWords = listWords.filter(wordInfo => wordInfo.is_wrong_answer);
-                sessionStorage.words = JSON.stringify({words: listWords});
-                window.location.href = '../../../../';
+                restartGame();
+                // sessionStorage.words = JSON.stringify({words: listWords});
+                // window.location.href = '../../../../';
             }
         } else {
             wrongAnswers.style.color = 'Green';
         }
 
         document.body.addEventListener('keydown', (event) => {
-            var link;
 
             switch(event.code) {
                 case 'Enter':
-                    link = '../../../../';
+                    restartGame();
                     break;
                 case 'KeyQ':
-                    link = '../../../../../';
+                    back();
                     break;
                 default:
                     return;
             };
-            window.location.href = link;
+
             }, false);
     </script>
     <script src="{{url_for('static', filename='scripts/theme.js')}}"></script>
