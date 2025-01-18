@@ -116,7 +116,7 @@ def statistic(lang: str, total_words: str, right_answers_count: str, wrong_answe
     db.query_execute(queries.SET_IS_FORGOTTEN_YES, params=[(wrong_id,) for wrong_id in wrong_ids], is_ext=True)
 
   return render_template('statistic.html', total=total_words_num,
-               right=wrong_answers_count_num, wrong=wrong_answers_count_num, percent=percent)
+               right=right_answers_count_num, wrong=wrong_answers_count_num, percent=percent)
 
 
 @app.route('/dictionary/<lang>/download/', methods=['GET'])
