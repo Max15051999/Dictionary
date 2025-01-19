@@ -24,9 +24,12 @@
             <label class="label" for="original-input-word">Слово на
                 <select id="langs-selector" name="lang">
                     {% for dict in my_dicts  %}
-                        <option>{{dict}}</option>
+                        <option value="{{dict}}">{{dict}}</option>
                     {% endfor %}
-                </select>*</label><br><br>
+                </select>*</label><img class="word-say" title="Произнести"
+                         onclick="sayWord(document.getElementById('original-input-word').value, document.getElementById('langs-selector').value);"
+                         src="{{url_for('static', filename='img/say_word_icon.png')}}">
+            <br><br>
             <input class="input" id="original-input-word" name="original_word" type="text" value="{{word_en}}" placeholder="Введите слово..." required>
             <br><br><br>
             <label class="label" for="input_ru">Перевод на русский*</label><br><br>
@@ -42,6 +45,7 @@
     </div>
     <script src="{{url_for('static', filename='scripts/theme.js')}}"></script>
     <script src="{{url_for('static', filename='scripts/special_symbols.js')}}"></script>
+    <script src="{{url_for('static', filename='scripts/scripts.js')}}"></script>
 
     {% if lang %}
         <script>
