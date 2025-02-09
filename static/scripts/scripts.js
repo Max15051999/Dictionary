@@ -488,7 +488,8 @@ function checkTranslateWord() {
     var questionStatusImg = document.getElementById('question-status');
 
     if (translateWordValue != '') {
-        translateWordValue = translateWordValue.charAt(0).toUpperCase() + translateWordValue.toLowerCase().slice(1);
+        // translateWordValue = translateWordValue.charAt(0).toUpperCase() + translateWordValue.toLowerCase().slice(1);
+        translateWordValue = translateWordValue.toLocaleLowerCase()
         translateWordValue = translateWordValue.replace('ё', 'е');
         var sourceLang = sessionStorage.getItem('source_lang');
         var originalWord = listWords[wordIndex - 1][sourceLang == 'RU' ? 'original' : 'translate'];
@@ -498,16 +499,16 @@ function checkTranslateWord() {
         var isAnswerRight = false;
 
         if (wordVariants.length > 1) {
-            translateWordValue = translateWordValue.toLowerCase();
+            // translateWordValue = translateWordValue.toLowerCase();
 
             for (var word of wordVariants) {
-                if (word.toLowerCase().trim().replace('ё', 'е') == translateWordValue) {
+                if (word.toLocaleLowerCase().trim().replace('ё', 'е') === translateWordValue) {
                     isAnswerRight = true;
                     break;
                 }
             }
         } else {
-            isAnswerRight = translateWordValue == originalWord.replace('ё', 'е');
+            isAnswerRight = translateWordValue === originalWord.toLocaleLowerCase().replace('ё', 'е');
         }
 
         var imgUrl;

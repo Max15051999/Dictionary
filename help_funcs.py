@@ -62,7 +62,7 @@ def check_if_word_in_db(original_word: str, lang: str) -> bool:
 	return False
 
 def add_word_in_db(original_word: str, word_ru: str, transcription: str, lang: str):
-	original_word = original_word.capitalize()
+	original_word = original_word.title()
 	word_ru = word_ru.capitalize()
 	transcription = transcription.capitalize()
 	current_date = datetime.now().strftime(config.CURRENT_DATE_PATTERN)
