@@ -490,7 +490,7 @@ function checkTranslateWord() {
     if (translateWordValue != '') {
         // translateWordValue = translateWordValue.charAt(0).toUpperCase() + translateWordValue.toLowerCase().slice(1);
         translateWordValue = translateWordValue.toLocaleLowerCase()
-        translateWordValue = translateWordValue.replace('ё', 'е');
+        translateWordValue = translateWordValue.replaceAll('ё', 'е');
         var sourceLang = sessionStorage.getItem('source_lang');
         var originalWord = listWords[wordIndex - 1][sourceLang == 'RU' ? 'original' : 'translate'];
         var wordVariants = originalWord.split(',');
@@ -502,13 +502,13 @@ function checkTranslateWord() {
             // translateWordValue = translateWordValue.toLowerCase();
 
             for (var word of wordVariants) {
-                if (word.toLocaleLowerCase().trim().replace('ё', 'е') === translateWordValue) {
+                if (word.toLocaleLowerCase().trim().replaceAll('ё', 'е') === translateWordValue) {
                     isAnswerRight = true;
                     break;
                 }
             }
         } else {
-            isAnswerRight = translateWordValue === originalWord.toLocaleLowerCase().replace('ё', 'е');
+            isAnswerRight = translateWordValue === originalWord.toLocaleLowerCase().replaceAll('ё', 'е');
         }
 
         var imgUrl;
