@@ -254,6 +254,9 @@ def add_word_in_db(word1: str, word2: str, first_lang: str, second_lang: str):
   help_funcs.add_word_in_db(original_word, russian_word, transcription,
                             first_lang if first_lang != config.RU_LANG_ALIAS else second_lang)
 
+  print(first_lang)
+  print(second_lang)
+
   return translate(has_word_add=True, lang_from=first_lang, lang_to=second_lang)
 
 
@@ -333,7 +336,6 @@ def add_new_word():
 @app.route('/dictionary/<lang>/search/<word_part>/', methods=['GET'])
 def search_word_card(lang: str, word_part: str):
   words = help_funcs.search_words(word_part, lang)
-  print(f'WORDS: {words}')
   is_err = False
   is_search = True
 

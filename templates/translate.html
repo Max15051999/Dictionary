@@ -52,9 +52,9 @@
                 <td></td>
             </tr>
             <tr>
-                <td><h1 id="first-lang" data-code="{{_from}}">{{foreign_langs[_from]}}</h1></td>
+                <td><h1 id="first-lang" data-code="{{_from}}">{{'Русский' if _from == 'RU' else foreign_langs[_from]}}</h1></td>
                 <td><input type="button" value="&lt;&gt;" id="change-langs" onclick="changeLangs();"></td>
-                <td><h1 id="second-lang" data-code="{{to}}">{{'Русский' if to == 'RU' else to}}</h1></td>
+                <td><h1 id="second-lang" data-code="{{to}}">{{'Русский' if to == 'RU' else foreign_langs[to]}}</h1></td>
             </tr>
             <tr>
                 <td><img class="word-say" title="Произнести"
@@ -89,7 +89,7 @@
                 checkTextareaInputText();
         });
 
-        document.getElementById('original-lang').value = '{{foreign_langs[_from]}}';
+        document.getElementById('original-lang').value = '{{foreign_langs[to] if _from == 'RU' else foreign_langs[_from]}}';
 
         if ('{{_from}}' != 'EN')
             document.getElementById('wordhunt').disabled = true;
