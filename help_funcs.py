@@ -23,10 +23,10 @@ def get_translate_by_word(word: str, first_lang: str, is_part_word: bool, second
 	word = word.capitalize()
 	is_first_part = len(word) == 1
 
-	if first_lang == ForeignLang.EN.value:
+	if first_lang == ForeignLang.EN.name:
 		query = queries.GET_TRANSLATE_AND_TRANSCRIPTION_BY_ENGLISH_WORD(is_part_word, is_first_part)
 		params = [word, first_lang]
-	elif first_lang == ForeignLang.DE.value:
+	elif first_lang == ForeignLang.DE.name:
 		query = queries.GET_TRANSLATE_AND_TRANSCRIPTION_BY_DEUTSCH_WORD(is_part_word, is_first_part)
 		params = [word, first_lang]
 	elif first_lang == config.RU_LANG_ALIAS:

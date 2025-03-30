@@ -284,24 +284,27 @@ def change_word(dictionary_lang: str, word_id: str, word_en: str, word_ru: str, 
   word_id = int(word_id)
   msg = ''
 
-  db = help_funcs.connect_to_db()
-  my_dicts = db.query_execute(queries.GET_DICTIONARIES, is_fetch_all=True)
-  my_dicts = [lang[0] for lang in my_dicts]
+  # db = help_funcs.connect_to_db()
+  # my_dicts = db.query_execute(queries.GET_DICTIONARIES, is_fetch_all=True)
+  # my_dicts = [lang[0] for lang in my_dicts]
 
-  lang = None
+  lang_code = None
   if request.method == 'POST':
-    is_err, word_en, word_ru, transcription, lang = help_funcs.prepare_words_and_check(request)
+    is_err, word_en, word_ru, transcription, lang_code = help_funcs.prepare_words_and_check(request)
 
     if not is_err:
       db = help_funcs.connect_to_db()
-      db.query_execute(queries.UPDATE_WORD, params=(word_en, word_ru, transcription, lang, word_id))
+      db.query_execute(queries.UPDATE_WORD, params=(word_en, word_ru, transcription, lang_code, word_id))
       msg = 'Слово успешно изменено'
     else:
       msg = 'Ошибка изменения слова'
 
+  lang_code = lang_code if lang_code else dictionary_lang
+
   return render_template('add_change_word.html', title=title, msg=msg,
                word_id=word_id, word_en=word_en, word_ru=word_ru,
-               transcription=transcription, my_dicts=my_dicts, lang=lang if lang else dictionary_lang,
+               transcription=transcription, my_langs={lang.name : lang.value[:-2] + 'ом' if lang.value.endswith('ий') else lang.value
+                                  for lang in ForeignLang}, lang=lang_code,
                href_back=f'/dictionary/{dictionary_lang}/')
 
 
@@ -330,7 +333,7 @@ def add_new_word():
 @app.route('/dictionary/<lang>/search/<word_part>/', methods=['GET'])
 def search_word_card(lang: str, word_part: str):
   words = help_funcs.search_words(word_part, lang)
-  # print(f'WORDS: {words}')
+  print(f'WORDS: {words}')
   is_err = False
   is_search = True
 
@@ -338,7 +341,7 @@ def search_word_card(lang: str, word_part: str):
     is_err = True
 
   return render_template('dictionary.html', words=words,
-               href_back='../../', is_err=is_err, is_search=is_search, dictionary_lang=lang)
+               href_back='../../', is_err=is_err, is_search=is_search, dictionary_lang_code=lang)
 
 
 @app.route('/update_service/<service>/<first_lang>/<second_lang>/', methods=['GET'])
