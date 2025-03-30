@@ -23,8 +23,8 @@
 
             <label class="label" for="original-input-word">Слово на
                 <select id="langs-selector" name="lang">
-                    {% for dict in my_dicts  %}
-                        <option value="{{dict}}">{{dict}}</option>
+                    {% for lang in my_langs|items  %}
+                        <option value="{{lang.0}}">{{lang.1}}</option>
                     {% endfor %}
                 </select>*</label><img class="word-say" title="Произнести"
                          onclick="sayWord(document.getElementById('original-input-word').value, document.getElementById('langs-selector').value);"

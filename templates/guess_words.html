@@ -16,7 +16,7 @@
     {% else %}
         <div class="container">
             {% include 'theme.html' %}
-            <h1>Угадай слова на {{lang}}</h1>
+            <h1>Угадай слова на {{lang_name[:-2] + 'ом' if lang_name.endswith('ий') else lang_name}}</h1>
             <hr><br><br><br>
             <label id="total-dict-words"></label>
             <button id="show-hide" onclick="showHideListWords(this);">SHOW</button><br><br>
@@ -27,10 +27,10 @@
             <br><br><br>
 
             <input type="radio" id="EN_RU" name="from_to" checked>
-            <label id="original-lang-label" for="EN_RU">С {{lang}} на русский</label>
+            <label id="original-lang-label" for="EN_RU">С {{lang_name[:-2] + 'ого' if lang_name.endswith('ий') else lang_name}} на Русский</label>
             <br><br>
             <input type="radio" id="RU_EN" name="from_to">
-            <label id="second-lang-label" for="RU_EN">С русского на {{lang}}</label>
+            <label id="second-lang-label" for="RU_EN">С Русского на {{lang_name}}</label>
             <br><br><br>
 
             <div id="list-words" style="display: none">
@@ -44,12 +44,12 @@
                     </script>
                 {% endfor %}
                 <script>
-                    updateStorageListWords('{{lang}}');
+                    updateStorageListWords('{{lang_code}}');
                 </script>
             </div>
             <br><br><br>
-            <button onclick="startGame('{{lang}}');">Начать игру со всеми словами</button><br><br>
-            <button onclick="startGame('{{lang}}', true);">Начать игру с забывающимися словами</button><br><br>
+            <button onclick="startGame('{{lang_code}}');">Начать игру со всеми словами</button><br><br>
+            <button onclick="startGame('{{lang_code}}', true);">Начать игру с забывающимися словами</button><br><br>
             <a href=".."><button>Назад</button></a>
         </div>
     {% endif %}

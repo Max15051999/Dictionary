@@ -13,9 +13,11 @@
 <body>
     <div class="container">
         {% include 'theme.html' %}
-        <h1>Game ({{lang}})</h1>
+        <h1>Игра в слова на  {{lang}}</h1>
         <hr><br><br><br>
         <label id="current_total" style="font-size: 30px;"></label><br><br>
+        <label id="right_total">0</label>
+        <label id="wrong_total">0</label><br><br>
         <img id="question-status" src="{{url_for('static', filename='img/thinking_icon.png')}}"/><br>
 
         {% include 'special_symbols.html' %}

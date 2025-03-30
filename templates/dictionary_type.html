@@ -14,10 +14,10 @@
 
     {% if my_dicts|length > 0 %}
         <table id="dicts-table">
-            {% for dict in my_dicts %}
+            {% for dict in my_dicts|items %}
                 <tr>
                     <td>
-                        <a href='/{{next_page}}/{{dict.0}}/'><button>{{dict.0}}-русский словарь</button></a>
+                        <a href='/{{next_page}}/{{dict.0}}/'><button>Русско-{{dict.1}} словарь</button></a>
                     </td>
                 </tr>
             {% endfor %}

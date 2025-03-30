@@ -44,21 +44,21 @@
         <table id="trans-table">
             <tr>
                 <td><select id="original-lang" onchange="setForeignLang(event);">
-                    {% for foreign_lang in foreign_langs %}
-                        <option>{{foreign_lang}}</option>
+                    {% for foreign_lang in foreign_langs|items %}
+                        <option name="{{foreign_lang.0}}">{{foreign_lang.1}}</option>
                     {% endfor %}
                 </select></td>
                 <td></td>
                 <td></td>
             </tr>
             <tr>
-                <td><h1 id="first-lang">{{_from}}</h1></td>
+                <td><h1 id="first-lang" data-code="{{_from}}">{{foreign_langs[_from]}}</h1></td>
                 <td><input type="button" value="&lt;&gt;" id="change-langs" onclick="changeLangs();"></td>
-                <td><h1 id="second-lang">{{to}}</h1></td>
+                <td><h1 id="second-lang" data-code="{{to}}">{{'Русский' if to == 'RU' else to}}</h1></td>
             </tr>
             <tr>
                 <td><img class="word-say" title="Произнести"
-                         onclick="sayWord(document.getElementById('original-input-word').value, document.getElementById('first-lang').innerHTML);"
+                         onclick="sayWord(document.getElementById('original-input-word').value, document.getElementById('first-lang').getAttribute('data-code'));"
                          src="{{url_for('static', filename='img/say_word_icon.png')}}"></td>
                 <td></td>
                 <td><img class="word-say" title="Произнести"
@@ -89,7 +89,7 @@
                 checkTextareaInputText();
         });
 
-        document.getElementById('original-lang').value = '{{_from}}';
+        document.getElementById('original-lang').value = '{{foreign_langs[_from]}}';
 
         if ('{{_from}}' != 'EN')
             document.getElementById('wordhunt').disabled = true;

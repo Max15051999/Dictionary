@@ -6,9 +6,13 @@ function changeLangs() {
     var readTranslateTextarea = document.getElementById('read-translate');
 
     var firstLabelText = firstLabel.innerHTML;
+    var firstLabelCode = firstLabel.getAttribute('data-code');
 
     firstLabel.innerHTML = secondLabel.innerHTML;
+    firstLabel.setAttribute('data-code', secondLabel.getAttribute('data-code'))
+
     secondLabel.innerHTML = firstLabelText;
+    secondLabel.setAttribute('data-code', firstLabelCode)
 
     var inputText = inputTextarea.value.trim();
     var translateText = readTranslateTextarea.value.trim();
@@ -33,8 +37,8 @@ function checkTextareaInputText() {
     var inputText = document.getElementById('original-input-word').value.trim();
 
     if (inputText != '') {
-        var firstLang = document.getElementById('first-lang').innerHTML;
-        var secondLang = document.getElementById('second-lang').innerHTML;
+        var firstLang = document.getElementById('first-lang').getAttribute('data-code');
+        var secondLang = document.getElementById('second-lang').getAttribute('data-code');
 
         var service = document.getElementById('google').checked ? 'google' : 'wordhunt';
         window.location.href = `/translate/${inputText}/${firstLang}/${secondLang}/`;
@@ -46,8 +50,8 @@ function checkTextareaInputText() {
 function addWordInDatabase() {
     var inputWord = document.getElementById('original-input-word').value.trim();
     var translatedWord = document.getElementById('read-translate').value.trim();
-    var firstLang = document.getElementById('first-lang').innerHTML;
-    var secondLang = document.getElementById('second-lang').innerHTML;
+    var firstLang = document.getElementById('first-lang').getAttribute('data-code');
+    var secondLang = document.getElementById('second-lang').getAttribute('data-code');
 
     if (inputWord != '' && translatedWord != '')
         window.location.href = `/add_new_word/${inputWord}/${translatedWord}/${firstLang}/${secondLang}/`
@@ -58,8 +62,8 @@ function addWordInDatabase() {
 function updateServiceForTranslate(service) {
     // var service = document.getElementById('google').checked ? 'google' : 'wordhunt';
 
-    var firstLang = document.getElementById('first-lang').innerHTML;
-    var secondLang = document.getElementById('second-lang').innerHTML;
+    var firstLang = document.getElementById('first-lang').getAttribute('data-code');
+    var secondLang = document.getElementById('second-lang').getAttribute('data-code');
     window.location.href = `/update_service/${service}/${firstLang}/${secondLang}/`;
 
 //    if (document.getElementById('original-lang').target.value != 'EN') {
@@ -72,13 +76,18 @@ function updateServiceForTranslate(service) {
 }
 
 function setForeignLang(event) {
-    var foreignLang = event.target.value;
+    var foreignLang = event.target;
+    var langCode = foreignLang.options[foreignLang.selectedIndex].attributes.name.value;
 
-    document.getElementById('first-lang').innerHTML = foreignLang;
-    document.getElementById('second-lang').innerHTML = 'RU';
+    var firstLangLabel = document.getElementById('first-lang');
+    firstLangLabel.innerHTML = foreignLang.value;
+    firstLangLabel.setAttribute('data-code', langCode);
+
+    document.getElementById('second-lang').innerHTML = 'Русский';
 
     var wordhuntBtn = document.getElementById('wordhunt');
-    if (foreignLang != 'EN') {
+
+    if (langCode != 'EN') {
         var service = wordhuntBtn.checked ? 'wordhunt' : 'google';
 
         document.getElementById('google').checked = true;

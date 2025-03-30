@@ -12,15 +12,6 @@ import json
 app = Flask(__name__)
 
 
-@app.route('/test/')
-def example():
-  # db = help_funcs.connect_to_db()
-  # forgotten_words = db.query_execute(f""" SELECT * FROM {config.TABLE_NAME} WHERE is_forgotten; """, is_fetch_all=True)
-  # print(forgotten_words)
-  # db.query_execute(f""" ALTER TABLE {config.TABLE_NAME} ADD COLUMN is_forgotten integer default false; """)
-  return render_template('test.html')
-
-
 @app.route('/')
 def index():
   db = help_funcs.connect_to_db()
@@ -31,47 +22,52 @@ def index():
 
 @app.route('/translate/', methods=['GET'])
 def translate(is_word_in_dictionary: bool = False, has_word_add: bool = False, lang_from: str = config.EN_LANG_ALIAS,
-        lang_to: str = config.RU_LANG_ALIAS):
+              lang_to: str = config.RU_LANG_ALIAS):
   service_name = help_funcs.open_json(config.SERVICE_JSON_NAME)
   is_service_google = service_name == config.GOOGLE_SEVICE_NAME
 
   return render_template('translate.html', is_service_google=is_service_google,
                is_word_in_dictionary=is_word_in_dictionary, has_word_add=has_word_add,
                _from=lang_from, to=lang_to,
-               foreign_langs=[foreign_lang.value for foreign_lang in ForeignLang])
+               foreign_langs={foreign_lang.name : foreign_lang.value for foreign_lang in ForeignLang})
 
 
 @app.route('/dictionaries/', methods=['GET'])
 def my_dictionaries():
   db = help_funcs.connect_to_db()
   my_dicts = db.query_execute(queries.GET_DICTIONARIES, is_fetch_all=True)
-  return render_template('dictionary_type.html', my_dicts=my_dicts, title='Мои словари',
+
+  code_name_dict_dct = {my_dict[0] : ForeignLang.get_lang_by_code(my_dict[0]) for my_dict in my_dicts}
+  return render_template('dictionary_type.html', my_dicts=code_name_dict_dct, title='Мои словари',
                next_page='dictionary')
 
 
-@app.route('/dictionary/<dictionary_lang>/', methods=['GET'])
-def show_dictionary(dictionary_lang: str):
+@app.route('/dictionary/<dictionary_lang_code>/', methods=['GET'])
+def show_dictionary(dictionary_lang_code: str):
   db = help_funcs.connect_to_db()
 
-  words = db.query_execute(queries.SELECT_ALL_WORDS, params=(dictionary_lang,), is_fetch_all=True)
+  words = db.query_execute(queries.SELECT_ALL_WORDS, params=(dictionary_lang_code,), is_fetch_all=True)
 
-  return render_template('dictionary.html', words=words, dictionary_lang=dictionary_lang, href_back='/dictionaries/')
+  return render_template('dictionary.html', words=words, dictionary_lang_name=ForeignLang.get_lang_by_code(dictionary_lang_code),
+                         dictionary_lang_code=dictionary_lang_code, href_back='/dictionaries/')
 
 
 @app.route('/guess_words/', methods=['GET'])
 def show_dicts_for_guess_words():
   db = help_funcs.connect_to_db()
   my_dicts = db.query_execute(queries.GET_DICTIONARIES, is_fetch_all=True)
-  return render_template('dictionary_type.html', my_dicts=my_dicts, title='Словари для угадывания слов',
+
+  code_name_dict_dct = {my_dict[0]: ForeignLang.get_lang_by_code(my_dict[0]) for my_dict in my_dicts}
+  return render_template('dictionary_type.html', my_dicts=code_name_dict_dct, title='Словари для угадывания слов',
                is_game=True, next_page='guess_words')
 
 
-@app.route('/guess_words/<lang>/', methods=['GET'])
-def guess_words(lang: str):
+@app.route('/guess_words/<lang_code>/', methods=['GET'])
+def guess_words(lang_code: str):
   db = help_funcs.connect_to_db()
 
-  words_for_guess = db.query_execute(queries.GET_WORDS_OF_CONCRETE_LANG_INFO_FOR_GUESS_GAME, params=(lang,),
-                     is_fetch_all=True)
+  words_for_guess = db.query_execute(queries.GET_WORDS_OF_CONCRETE_LANG_INFO_FOR_GUESS_GAME, params=(lang_code,),
+                                     is_fetch_all=True)
 
   # lang_words_dct = {}
   #
@@ -84,18 +80,23 @@ def guess_words(lang: str):
   #     lang_words_dct[lng] = [word_for_guess]
 
   # print(f'WORDS FOR QUESS: {words_for_guess}')
-  return render_template('guess_words.html', words=words_for_guess, lang=lang)
+  lang_name = ForeignLang.get_lang_by_code(lang_code)
+  return render_template('guess_words.html', words=words_for_guess, lang_code=lang_code, lang_name=lang_name)
 
 
-@app.route('/guess_words/<lang>/game/', methods=['GET'])
-def game(lang: str):
-  return render_template('game.html', lang=lang)
+@app.route('/guess_words/<lang_code>/game/', methods=['GET'])
+def game(lang_code: str):
+  lang_name = ForeignLang.get_lang_by_code(lang_code)
+  lang_name = lang_name[:-2] + 'ом' if lang_name.endswith('ий') else lang_name
+  return render_template('game.html', lang=lang_name)
 
 
-@app.route('/guess_words/<lang>/game/statistic/<total_words>/<right_answers_count>/<wrong_answers_count>/',
+@app.route('/guess_words/<lang_code>/game/statistic/<total_words>/<right_answers_count>/<wrong_answers_count>/',
        methods=['GET', 'POST'])
-def statistic(lang: str, total_words: str, right_answers_count: str, wrong_answers_count: str):
+def statistic(lang_code: str, total_words: str, right_answers_count: str, wrong_answers_count: str):
   total_words_num, right_answers_count_num, wrong_answers_count_num, percent = 0, 0, 0, 0.0
+  lang_name = ForeignLang.get_lang_by_code(lang_code)
+  lang_name = lang_name[:-2] + 'ом' if lang_name.endswith('ий') else lang_name
 
   if request.method == 'GET':
 
@@ -112,11 +113,11 @@ def statistic(lang: str, total_words: str, right_answers_count: str, wrong_answe
     wrong_ids: List[int] = data['wrongIds']
 
     db = help_funcs.connect_to_db()
-    db.query_execute(queries.SET_ALL_WORDS_IS_FORGOTTEN_NO, params=(lang,))
+    db.query_execute(queries.SET_ALL_WORDS_IS_FORGOTTEN_NO, params=(lang_code,))
     db.query_execute(queries.SET_IS_FORGOTTEN_YES, params=[(wrong_id,) for wrong_id in wrong_ids], is_ext=True)
 
   return render_template('statistic.html', total=total_words_num,
-               right=right_answers_count_num, wrong=wrong_answers_count_num, percent=percent)
+               right=right_answers_count_num, wrong=wrong_answers_count_num, percent=percent, lang=lang_name)
 
 
 @app.route('/dictionary/<lang>/download/', methods=['GET'])
@@ -232,7 +233,7 @@ def get_translate(word: str, _from: str, to: str):
 
   return render_template('translate.html', _from=_from, to=to,
                word=word, trans=translate_word, is_err=is_err, is_service_google=is_service_google,
-               foreign_langs=[foreign_lang.value for foreign_lang in ForeignLang])
+               foreign_langs={foreign_lang.name : foreign_lang.value for foreign_lang in ForeignLang})
 
 
 @app.route('/add_new_word/<word1>/<word2>/<first_lang>/<second_lang>/')
@@ -251,7 +252,7 @@ def add_word_in_db(word1: str, word2: str, first_lang: str, second_lang: str):
     return translate(is_word_in_dictionary=True)
 
   help_funcs.add_word_in_db(original_word, russian_word, transcription,
-                first_lang if first_lang != config.RU_LANG_ALIAS else second_lang)
+                            first_lang if first_lang != config.RU_LANG_ALIAS else second_lang)
 
   return translate(has_word_add=True, lang_from=first_lang, lang_to=second_lang)
 
@@ -322,7 +323,8 @@ def add_new_word():
       msg = 'Слово успешно добавлено в словарь'
 
   return render_template('add_change_word.html', title=title,
-               msg=msg, my_dicts=[lang.value for lang in ForeignLang], lang=lang, href_back='/')
+               msg=msg, my_langs={lang.name : lang.value[:-2] + 'ом' if lang.value.endswith('ий') else lang.value
+                                  for lang in ForeignLang}, lang=lang, href_back='/')
 
 
 @app.route('/dictionary/<lang>/search/<word_part>/', methods=['GET'])
@@ -344,7 +346,7 @@ def update_service(service: str, first_lang: str, second_lang: str):
   help_funcs.open_json(config.SERVICE_JSON_NAME, mode='w', service_name=service)
   is_service_google = service == config.GOOGLE_SEVICE_NAME
   return render_template('translate.html', is_service_google=is_service_google, _from=first_lang,
-               to=second_lang, foreign_langs=[foreign_lang.value for foreign_lang in ForeignLang])
+               to=second_lang, foreign_langs={foreign_lang.name : foreign_lang.value for foreign_lang in ForeignLang})
 
 
 @app.route('/upload_file/<lang>/', methods=['POST'])
