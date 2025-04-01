@@ -62,7 +62,7 @@
                          src="{{url_for('static', filename='img/say_word_icon.png')}}"></td>
                 <td></td>
                 <td><img class="word-say" title="Произнести"
-                         onclick="sayWord(document.getElementById('read-translate').value, document.getElementById('second-lang').innerHTML);"
+                         onclick="sayWord(document.getElementById('read-translate').value, document.getElementById('second-lang').getAttribute('data-code'));"
                          src="{{url_for('static', filename='img/say_word_icon.png')}}"></td>
             </tr>
             <tr>
