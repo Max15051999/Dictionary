@@ -6,6 +6,11 @@
     background: BurlyWood;
     border: 5px solid DarkCyan;
     border-radius: 10px;
+
+    @media (max-width:768px) {
+        margin-left: 0%;
+        width: 100%;
+    }
 }
 
 #original-input-word {
@@ -16,4 +21,9 @@
 #question-status {
     width: 10%;
     height: 10%;
+
+    @media (max-width:768px) {
+        width: 40%;
+        height: 40%;
+    }
 }

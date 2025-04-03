@@ -13,7 +13,12 @@ button {
     font-size: 30px;
     background: gold;
     cursor: pointer;
+
+    @media (max-width:768px) {
+        width: 320px;
+    }
 }
+
 
 a {
     text-decoration:none;
@@ -28,4 +33,9 @@ img {
     width: 5%;
     height: 5%;
     cursor: pointer;
+
+    @media (max-width:768px) {
+        width: 30px;
+        height: 30px;
+    }
 }

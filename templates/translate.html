@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1" charset="UTF-8">
     <title>Translate</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/translate.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/index.css') }}">
@@ -41,6 +41,7 @@
 
         {% include 'special_symbols.html' %}
 
+        <br><br>
         <table id="trans-table">
             <tr>
                 <td><select id="original-lang" onchange="setForeignLang(event);">

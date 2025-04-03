@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1" charset="UTF-8">
     <title>My Dictionary</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/dictionary.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/index.css') }}">
@@ -28,13 +28,13 @@
 
         {% if words|length > 0 %}
             <a href="/dictionaries/"><img title="К выбору словаря" src="{{url_for('static', filename='img/back_icon.png')}}"></a>
-            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
             <img title="Удалить всё" src="{{url_for('static', filename='img/delete_all_icon.png')}}" onclick="deleteWord(0, '', '{{dictionary_lang_code}}');">
-            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
             <a href="/dictionary/{{dictionary_lang_code}}/download/"><img title="Скачать словарь" src="{{url_for('static', filename='img/download_icon.png')}}"></a>
-            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
             <a href="/dictionary/{{dictionary_lang_code}}/upload/"><img title="Загрузить словарь" src="{{url_for('static', filename='img/upload_icon.png')}}"></a>
-            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
             <img id="saying-words-img" title="Произнести все слова по порядку" src="{{url_for('static', filename='img/start_saying_words.png')}}" onclick="startStopSayingAllWords();">
             <br><br>
             <input id="search-input" type="text" placeholder="Введите слово...">
