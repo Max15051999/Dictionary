@@ -20,69 +20,69 @@
             alert('Слова успешно загружены!');
             window.location.href = '/dictionary/{{lang}}/';
         </script>
-    {% endif %}
+    {% else %}
+        <div class="container">
+            {% include 'theme.html' %}
+            <h1>{{ 'Найдено' if is_search else dictionary_lang_name + ' словарь' }} ({{words|length}})</h1>
 
-    <div class="container">
-        {% include 'theme.html' %}
-        <h1>{{ 'Найдено' if is_search else dictionary_lang_name + ' словарь' }} ({{words|length}})</h1>
+            {% if words|length > 0 %}
+                <a href="/dictionaries/"><img title="К выбору словаря" src="{{url_for('static', filename='img/back_icon.png')}}"></a>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                <img title="Удалить всё" src="{{url_for('static', filename='img/delete_all_icon.png')}}" onclick="deleteWord(0, '', '{{dictionary_lang_code}}');">
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                <a href="/dictionary/{{dictionary_lang_code}}/download/"><img title="Скачать словарь" src="{{url_for('static', filename='img/download_icon.png')}}"></a>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                <a href="/dictionary/{{dictionary_lang_code}}/upload/"><img title="Загрузить словарь" src="{{url_for('static', filename='img/upload_icon.png')}}"></a>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                <img id="saying-words-img" title="Произнести все слова по порядку" src="{{url_for('static', filename='img/start_saying_words.png')}}" onclick="startStopSayingAllWords();">
+                <br><br>
+                <input id="search-input" type="text" placeholder="Введите слово...">
+                <img id="search-img" title="Поиск" src="{{url_for('static', filename='img/search_icon.png')}}" onclick="findWordCard();">
+                <br><br>
+                <label>Сортировать по</label><br><br>
+                <input id="alphabet" type="radio" value="alphabet" name="sort_by" onclick="sortWords();"><label for="alphabet">алфавиту</label>
+                <input id="date_to_add" type="radio" value="date_to_add" name="sort_by" onclick="sortWords('date');"><label for="date_to_add">Дате добавления</label>
+                {% include 'up_down_scroll.html' %}
+            {% else %}
+                <a href="/dictionary/{{dictionary_lang_code}}/upload/"><img title="Загрузить словарь" src="{{url_for('static', filename='img/upload_icon.png')}}"></a>
+            {% endif %}
 
-        {% if words|length > 0 %}
-            <a href="/dictionaries/"><img title="К выбору словаря" src="{{url_for('static', filename='img/back_icon.png')}}"></a>
-            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-            <img title="Удалить всё" src="{{url_for('static', filename='img/delete_all_icon.png')}}" onclick="deleteWord(0, '', '{{dictionary_lang_code}}');">
-            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-            <a href="/dictionary/{{dictionary_lang_code}}/download/"><img title="Скачать словарь" src="{{url_for('static', filename='img/download_icon.png')}}"></a>
-            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-            <a href="/dictionary/{{dictionary_lang_code}}/upload/"><img title="Загрузить словарь" src="{{url_for('static', filename='img/upload_icon.png')}}"></a>
-            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-            <img id="saying-words-img" title="Произнести все слова по порядку" src="{{url_for('static', filename='img/start_saying_words.png')}}" onclick="startStopSayingAllWords();">
-            <br><br>
-            <input id="search-input" type="text" placeholder="Введите слово...">
-            <img id="search-img" title="Поиск" src="{{url_for('static', filename='img/search_icon.png')}}" onclick="findWordCard();">
-            <br><br>
-            <label>Сортировать по</label><br><br>
-            <input id="alphabet" type="radio" value="alphabet" name="sort_by" onclick="sortWords();"><label for="alphabet">алфавиту</label>
-            <input id="date_to_add" type="radio" value="date_to_add" name="sort_by" onclick="sortWords('date');"><label for="date_to_add">Дате добавления</label>
-            {% include 'up_down_scroll.html' %}
-        {% else %}
-            <a href="/dictionary/{{dictionary_lang_code}}/upload/"><img title="Загрузить словарь" src="{{url_for('static', filename='img/upload_icon.png')}}"></a>
-        {% endif %}
+            <br><br><br>
 
-        <br><br><br>
+            <div style="margin-left: 80%;">
+                <input type="button" value="Выделить всё" onclick="checkedWords.forEach(item => item.checked = true);">
+                <input type="button" value="Снять выделение" onclick="checkedWords.forEach(item => item.checked = false);">
+            </div>
 
-        <div style="margin-left: 80%;">
-            <input type="button" value="Выделить всё" onclick="checkedWords.forEach(item => item.checked = true);">
-            <input type="button" value="Снять выделение" onclick="checkedWords.forEach(item => item.checked = false);">
+            <table id="words-table">
+                {% for word in words %}
+                <script>
+                    addWordsToList({{word.0}}, '{{word.1}}', '{{word.2}}', '{{word.3}}', '{{dictionary_lang_code}}', '{{word.5}}');
+                </script>
+
+                <tr>
+                    <td>
+                        <div class="word-card">
+                            <br>
+                            <img class="word-say" title="Произнести на {{dictionary_lang_code}}" src="{{url_for('static', filename='img/say_word_icon.png')}}" onclick="sayWord('{{word.1}}', '{{dictionary_lang_code}}');">
+                            <h2 class="word" title="Клик для перевода" data-trans="{{word.2}}" onclick="swapWords(this);" oncontextmenu="copyTextToClipBoard(this.innerHTML);">{{word.1}}</h2>
+                            <h3 class="transcription">{{word.3 if word.3 else ''}}</h3>
+                            <label class="date-to-add">{{word.5}}</label><br><br>
+                            <img class="word-delete" title="Удалить" src="{{url_for('static', filename='img/delete_word_icon.png')}}" onclick="deleteWord({{word.0}}, '{{word.1}}', '{{dictionary_lang_code}}');"/>
+                            <a class="word-change" href="/dictionary/{{dictionary_lang_code}}/change/{{word.0}}/{{word.1}}/{{word.2}}/{{word.3 if word.3 else 'ES'}}/"><img title="Изменить" src="{{url_for('static', filename='img/change_word_icon.png')}}"/></a>
+                        </div>
+                    </td>
+                    <td>
+                        <input id="word-{{loop.index0}}" class="word-checker" type="checkbox">
+                        <label for="word-{{loop.index0}}">Выделить</label>
+                    </td>
+                </tr>
+                {% endfor %}
+            </table>
+            <hr><br><br><br>
+            <a href="{{href_back}}"><button>Назад</button></a>
         </div>
-
-        <table id="words-table">
-            {% for word in words %}
-            <script>
-                addWordsToList({{word.0}}, '{{word.1}}', '{{word.2}}', '{{word.3}}', '{{dictionary_lang_code}}', '{{word.5}}');
-            </script>
-
-            <tr>
-                <td>
-                    <div class="word-card">
-                        <br>
-                        <img class="word-say" title="Произнести на {{dictionary_lang_code}}" src="{{url_for('static', filename='img/say_word_icon.png')}}" onclick="sayWord('{{word.1}}', '{{dictionary_lang_code}}');">
-                        <h2 class="word" title="Клик для перевода" data-trans="{{word.2}}" onclick="swapWords(this);" oncontextmenu="copyTextToClipBoard(this.innerHTML);">{{word.1}}</h2>
-                        <h3 class="transcription">{{word.3 if word.3 else ''}}</h3>
-                        <label class="date-to-add">{{word.5}}</label><br><br>
-                        <img class="word-delete" title="Удалить" src="{{url_for('static', filename='img/delete_word_icon.png')}}" onclick="deleteWord({{word.0}}, '{{word.1}}', '{{dictionary_lang_code}}');"/>
-                        <a class="word-change" href="/dictionary/{{dictionary_lang_code}}/change/{{word.0}}/{{word.1}}/{{word.2}}/{{word.3 if word.3 else 'ES'}}/"><img title="Изменить" src="{{url_for('static', filename='img/change_word_icon.png')}}"/></a>
-                    </div>
-                </td>
-                <td>
-                    <input id="word-{{loop.index0}}" class="word-checker" type="checkbox">
-                    <label for="word-{{loop.index0}}">Выделить</label>
-                </td>
-            </tr>
-            {% endfor %}
-        </table>
-        <hr><br><br><br>
-        <a href="{{href_back}}"><button>Назад</button></a>
-    </div>
+    {% endif %}
     <script>
         var searchInput = document.getElementById('search-input');
         var checkedWords = document.querySelectorAll('.word-checker');
