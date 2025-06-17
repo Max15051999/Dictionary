@@ -1,0 +1,1 @@
+This folder (files) must be in project. Without it will be an errors while you upload a new file with words.
