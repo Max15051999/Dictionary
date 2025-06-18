@@ -130,7 +130,7 @@
             translateWordInput.addEventListener('keydown', (event) => {
                 switch (event.code) {
                     case 'Enter':
-                        checkTranslateWord();
+                        checkTranslateWord(document.getElementById('check-answer'));
                         break;
                     case 'ControlRight':
                         sayWord(`${document.getElementById('original-word').innerHTML}`, sourceLang);
