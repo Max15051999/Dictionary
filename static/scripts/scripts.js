@@ -509,7 +509,7 @@ function setOriginalWord(lang) {
 
 //var rightAnswersCount = 0;
 //var wrongAnswersCount = 0;
-function checkTranslateWord() {
+function checkTranslateWord(checkBtn) {
     listWords = JSON.parse(sessionStorage.getItem('words')).words;
     // var translateWordInput = document.getElementById('translate-input');
     var translateWordValue = translateWordInput.value.trim();
@@ -562,8 +562,11 @@ function checkTranslateWord() {
             sessionStorage.words = JSON.stringify({words: listWords});
             return;
         }
+
         sessionStorage.words = JSON.stringify({words: listWords});
         // questionStatusImg.src = imgUrl;
+
+        checkBtn.disabled = true;
 
         setTimeout(() => {
             rightAnswerLabel.innerHTML = '';
@@ -580,7 +583,7 @@ function checkTranslateWord() {
                         cards[idx].innerHTML = variantWord;
                         setWordCardStyle(cards[idx], '5px solid DarkCyan', '50%', '25%');
                         idx++;
-                }
+                    }
                 }
 
             } else {
@@ -593,6 +596,7 @@ function checkTranslateWord() {
                 window.location.href = `${window.location.href}statistic/${wordIndex}/${rightAnswersCount}/${wrongAnswersCount}/`
                 // sessionStorage.words = JSON.stringify({words: []});
             }
+            checkBtn.disabled = false;
         }, 1000)
     } else {
         alert('Введите перевод слова');
