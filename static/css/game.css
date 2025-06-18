@@ -46,7 +46,7 @@
 }
 
 .word-card:hover {
-    border: 10px solid Red;
-    width: 60%;
-    margin-left: 20%;
+    border: 10px solid Red !important;
+    width: 60% !important;
+    margin-left: 20% !important;
 }
