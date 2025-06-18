@@ -16,22 +16,55 @@
         <h1>Игра в слова на  {{lang}}</h1>
         <hr><br><br><br>
         <label id="current_total" style="font-size: 30px;"></label><br><br>
-        <label id="right_total">0</label>
-        <label id="wrong_total">0</label><br><br>
+<!--        <label id="right_total">0</label>-->
+<!--        <label id="wrong_total">0</label><br><br>-->
         <img id="question-status" src="{{url_for('static', filename='img/thinking_icon.png')}}"/><br>
 
         {% include 'special_symbols.html' %}
 
         <label id="right-answer" style="color: green; font-size: 30px;"></label>
         <br><br><br>
+
         <div class="word-for-translate">
             <h2 title="Произнести (<Ctrl>)" id="original-word" onclick="sayWord(`${this.innerHTML}`, sourceLang)" style="cursor: pointer;">ORIGINAL</h2>
             <h3 id="transcription-word">TRANSCRIPTION</h3>
-            <input id="original-input-word" type="text" title="Введите перевод" placeholder="Перевод..."><br><br>
+
+            <div class="word-choose-input" style="display: none">
+                <input id="original-input-word" type="text" title="Введите перевод" placeholder="Перевод...">
+                <br><br>
+            </div>
+
+            <div class="word-choose-cards" style="display: none">
+                <div class="word-card" onclick="readWordCardText(this);">...</div><br>
+                <div class="word-card" onclick="readWordCardText(this);">...</div><br>
+                <div class="word-card" onclick="readWordCardText(this);">...</div><br>
+                <div class="word-card" onclick="readWordCardText(this);">...</div><br>
+                <br><br>
+            </div>
+
             <button id="check-answer" onclick="checkTranslateWord();">Готово</button>
         </div><br><br><br><br><br><br>
+
         <button onclick="checkBack();">Назад</button>
         <script>
+            var wordCards = sessionStorage.getItem('word_cards');
+
+            function setWordCardStyle(div, border, width, marginLeft) {
+                    div.style.border = border;
+                    div.style.width = width;
+                    div.style.marginLeft = marginLeft;
+                }
+
+            function readWordCardText(wordCard) {
+
+                for (var card of cards)
+                    setWordCardStyle(card, '5px solid DarkCyan', '50%', '25%');
+
+                setWordCardStyle(wordCard, '10px solid Red', '60%', '20%');
+
+                translateWordInput.value = wordCard.innerHTML;
+            }
+
             function checkBack() {
                 if (confirm('Вы действительно хотите выйти? Весь прогресс будет утерян'))
                     window.location.href = '..';
@@ -49,9 +82,48 @@
 
             setOriginalWord(sourceLang);
 
+            var lenListWords = listWords.length;
+
+            if (wordCards === 'true') {
+                document.getElementsByClassName('word-choose-cards')[0].style.display = 'block';
+                var cards = document.getElementsByClassName('word-card');
+
+                var originTrans = {}
+
+                for (var word of listWords) {
+                    var variants = [sourceLang == 'RU' ? word.original : word.translate];
+
+                    for (var i = 0; i < 3; i++) {
+                        var randWordIdx = Math.floor(Math.random() * (lenListWords - 1 - 0 + 1)) + 0;
+
+                        var randWord = sourceLang == 'RU' ? listWords[randWordIdx].original : listWords[randWordIdx].translate;
+
+                        if (variants.includes(randWord)) {
+                            i--;
+                            continue;
+                        }
+
+                        variants.push(randWord);
+
+                    }
+
+                    shuffle(variants);
+                    originTrans[sourceLang == 'RU' ? word.translate : word.original] = variants;
+                }
+
+                console.log(originTrans);
+
+                var idx = 0;
+                for (var variantWord of originTrans[originalWord.innerHTML])
+                    cards[idx++].innerHTML = variantWord;
+
+            } else {
+                document.getElementsByClassName('word-choose-input')[0].style.display = 'block';
+            }
+
             wordIndex++;
 
-            document.getElementById('current_total').innerHTML = `1/${listWords.length}`;
+            document.getElementById('current_total').innerHTML = `1/${lenListWords}`;
 
             var translateWordInput = document.getElementById('original-input-word');
             translateWordInput.focus();

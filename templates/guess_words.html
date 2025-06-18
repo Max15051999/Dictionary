@@ -26,6 +26,23 @@
             <label for="take-end">Брать с конца</label>
             <br><br><br>
 
+            <input type="radio" id="word-cards" name="choose-type">
+            <label for="word-cards">Карточки</label>
+            <input type="radio" id="word-text" name="choose-type" checked>
+            <label for="word-text">Текст</label>
+            <br><br><br>
+
+            <script>
+                var cardsRbtn = document.getElementById('word-cards');
+                var textRbtn = document.getElementById('word-text');
+            </script>
+
+            {% if words|length < 4 %}
+                <script>
+                    cardsRbtn.disabled = true;
+                </script>
+            {% endif %}
+
             <input type="radio" id="EN_RU" name="from_to" checked>
             <label id="original-lang-label" for="EN_RU">С {{lang_name[:-2] + 'ого' if lang_name.endswith('ий') else lang_name}} на Русский</label>
             <br><br>

@@ -27,3 +27,26 @@
         height: 40%;
     }
 }
+
+.word-card {
+    width: 50%;
+    margin-left: 25%;
+    color: Black;
+    font-size: 20px;
+    background: BurlyWood;
+    border: 5px solid DarkCyan;
+    border-radius: 10px;
+
+    cursor: pointer;
+
+    @media (max-width:768px) {
+        margin-left: 25%;
+        width: 50%;
+    }
+}
+
+.word-card:hover {
+    border: 10px solid Red;
+    width: 60%;
+    margin-left: 20%;
+}

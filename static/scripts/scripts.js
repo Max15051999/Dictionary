@@ -249,6 +249,14 @@ function setWordChecked(wordId) {
         totalWordsNumber.value = totalWords + 1;
     }
     updateStorageListWords();
+
+    if (totalWordsNumber.value < 4) {
+        cardsRbtn.checked = false;
+        cardsRbtn.disabled = true;
+        textRbtn.checked = true;
+    } else {
+        cardsRbtn.disabled = false;
+    }
 }
 
 //if (sessionStorage.getItem('words') == null)
@@ -398,6 +406,15 @@ function wordsInputChange(input) {
             }
         }
     }
+
+    if (input.value < 4) {
+        cardsRbtn.checked = false;
+        cardsRbtn.disabled = true;
+        textRbtn.checked = true;
+    } else {
+        cardsRbtn.disabled = false;
+    }
+
 }
 
 function updateStorageListWords(sourceLang = '', takeFromEnd = false) {
@@ -446,6 +463,7 @@ function startGame(foreignLang, is_forgotten=false) {
             window.location.href = window.location.href + 'game/';
         }
     }
+    sessionStorage.setItem('word_cards', document.getElementById('word-cards').checked)
 }
 
 function shuffle(listWords=null) {
@@ -484,7 +502,8 @@ function setOriginalWord(lang) {
     var wordInfo = listWords[wordIndex];
 
     originalWord.innerHTML = wordInfo[lang != 'RU' ? 'original' : 'translate'];
-    // console.log(lang)
+
+    console.log(originalWord.innerHTML)
     transcriptionWord.innerHTML = wordInfo.transcription ? wordInfo.transcription : '';
 }
 
@@ -501,13 +520,13 @@ function checkTranslateWord() {
         translateWordValue = translateWordValue.toLocaleLowerCase()
         translateWordValue = translateWordValue.replaceAll('ё', 'е');
         var sourceLang = sessionStorage.getItem('source_lang');
-        var originalWord = listWords[wordIndex - 1][sourceLang == 'RU' ? 'original' : 'translate'];
-        var wordVariants = originalWord.split(',');
+        var answer = listWords[wordIndex - 1][sourceLang == 'RU' ? 'original' : 'translate'];
         var rightAnswerLabel = document.getElementById('right-answer');
 
         var isAnswerRight = false;
 
-        if (wordVariants.length > 1) {
+        var wordVariants = answer.split(',');
+        if (wordVariants.length > 1 && wordCards != 'true') {
             // translateWordValue = translateWordValue.toLowerCase();
 
             for (var word of wordVariants) {
@@ -517,12 +536,12 @@ function checkTranslateWord() {
                 }
             }
         } else {
-            isAnswerRight = translateWordValue === originalWord.toLocaleLowerCase().replaceAll('ё', 'е');
+            isAnswerRight = translateWordValue === answer.toLocaleLowerCase().replaceAll('ё', 'е');
         }
 
         var imgUrl;
 
-        rightAnswerLabel.innerHTML = originalWord;
+        rightAnswerLabel.innerHTML = answer;
 
         if (isAnswerRight) {
             // rightAnswersCount++;
@@ -534,7 +553,7 @@ function checkTranslateWord() {
             questionStatusImg.src = '/static/img/right_answer_icon.png';
         } else {
             // wrongAnswersCount++;
-            // rightAnswerLabel.innerHTML = originalWord;
+            // rightAnswerLabel.innerHTML = answer;
             // console.log(wordIndex)
             listWords[wordIndex - 1].is_wrong_answer = true;
             // imgUrl = '/static/img/wrong_answer_icon.png';
@@ -554,6 +573,16 @@ function checkTranslateWord() {
                 setOriginalWord(sourceLang);
                 wordIndex++;
                 translateWordInput.value = '';
+
+                if (wordCards === 'true') {
+                    var idx = 0;
+                    for (var variantWord of originTrans[originalWord.innerHTML]) {
+                        cards[idx].innerHTML = variantWord;
+                        setWordCardStyle(cards[idx], '5px solid DarkCyan', '50%', '25%');
+                        idx++;
+                }
+                }
+
             } else {
                 var rightAnswersCount = 0;
 

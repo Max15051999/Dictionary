@@ -80,6 +80,10 @@
             wrongAnswers.title = 'Повторить с этими словами';
             wrongAnswers.onclick = () => {
                 listWords = listWords.filter(wordInfo => wordInfo.is_wrong_answer);
+
+                if (listWords.length < 4)
+                    sessionStorage.setItem('word_cards', false);
+
                 restartGame();
                 // sessionStorage.words = JSON.stringify({words: listWords});
                 // window.location.href = '../../../../';
