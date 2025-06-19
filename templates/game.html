@@ -93,15 +93,18 @@
                 for (var word of listWords) {
                     var variants = [sourceLang == 'RU' ? word.original : word.translate];
 
+                    var randWordIndexes = [originalWordIndex];
                     for (var i = 0; i < 3; i++) {
                         var randWordIdx = Math.floor(Math.random() * (lenListWords - 1 - 0 + 1)) + 0;
 
-                        var randWord = sourceLang == 'RU' ? listWords[randWordIdx].original : listWords[randWordIdx].translate;
-
-                        if (variants.includes(randWord)) {
+                        if (randWordIndexes.includes(randWordIdx)) {
                             i--;
                             continue;
                         }
+
+                        randWordIndexes.push(randWordIdx);
+
+                        var randWord = sourceLang == 'RU' ? listWords[randWordIdx].original : listWords[randWordIdx].translate;
 
                         variants.push(randWord);
 
