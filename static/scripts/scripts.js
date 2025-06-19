@@ -574,18 +574,18 @@ function checkTranslateWord(checkBtn) {
                 document.getElementById('current_total').innerHTML = `${wordIndex + 1}/${listWords.length}`;
                 questionStatusImg.src = '/static/img/thinking_icon.png';
                 setOriginalWord(sourceLang);
-                wordIndex++;
                 translateWordInput.value = '';
 
                 if (wordCards === 'true') {
                     var idx = 0;
-                    for (var variantWord of originTrans[originalWord.innerHTML]) {
+                    for (var variantWord of originTrans[`${wordIndex}_${originalWord.innerHTML}`]) {
                         cards[idx].innerHTML = variantWord;
                         setWordCardStyle(cards[idx], '5px solid DarkCyan', '50%', '25%');
                         idx++;
                     }
                     wordCardIndex = -1;
                 }
+                wordIndex++;
 
             } else {
                 var rightAnswersCount = 0;

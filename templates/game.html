@@ -89,6 +89,7 @@
 
                 var originTrans = {}
 
+                var originalWordIndex = 0;
                 for (var word of listWords) {
                     var variants = [sourceLang == 'RU' ? word.original : word.translate];
 
@@ -107,11 +108,11 @@
                     }
 
                     shuffle(variants);
-                    originTrans[sourceLang == 'RU' ? word.translate : word.original] = variants;
+                    originTrans[`${originalWordIndex++}_${sourceLang == 'RU' ? word.translate : word.original}`] = variants;
                 }
 
                 var idx = 0;
-                for (var variantWord of originTrans[originalWord.innerHTML])
+                for (var variantWord of originTrans[`${idx}_${originalWord.innerHTML}`])
                     cards[idx++].innerHTML = variantWord;
 
             } else {
