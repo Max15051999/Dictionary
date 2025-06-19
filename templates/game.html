@@ -72,7 +72,6 @@
 
             var originalWord = document.getElementById('original-word');
             var transcriptionWord = document.getElementById('transcription-word');
-            // console.log('GET ITEM: ' + sourceLang);
 
             if (sourceLang == 'RU')
                 transcriptionWord.hidden = true;
@@ -111,8 +110,6 @@
                     originTrans[sourceLang == 'RU' ? word.translate : word.original] = variants;
                 }
 
-                console.log(originTrans);
-
                 var idx = 0;
                 for (var variantWord of originTrans[originalWord.innerHTML])
                     cards[idx++].innerHTML = variantWord;
@@ -126,17 +123,44 @@
             document.getElementById('current_total').innerHTML = `1/${lenListWords}`;
 
             var translateWordInput = document.getElementById('original-input-word');
-            translateWordInput.focus();
-            translateWordInput.addEventListener('keydown', (event) => {
-                switch (event.code) {
-                    case 'Enter':
-                        checkTranslateWord(document.getElementById('check-answer'));
-                        break;
-                    case 'ControlRight':
-                        sayWord(`${document.getElementById('original-word').innerHTML}`, sourceLang);
-                        break;
+
+            function listener(event, isCards) {
+                    switch (event.code) {
+                        case 'Enter':
+                            checkTranslateWord(document.getElementById('check-answer'));
+                            break;
+                        case 'ControlRight':
+                            sayWord(`${document.getElementById('original-word').innerHTML}`, sourceLang);
+                            break;
+                        case 'ArrowUp':
+                            if (isCards) {
+                                wordCardIndex--;
+                                if (wordCardIndex <= -1)
+                                    wordCardIndex = 3;
+
+                                readWordCardText(cards[wordCardIndex]);
+                            }
+                            break;
+                        case 'ArrowDown':
+                            if (isCards) {
+                                wordCardIndex++;
+                                if (wordCardIndex === 4)
+                                    wordCardIndex = 0;
+
+                                readWordCardText(cards[wordCardIndex]);
+                            }
+                            break;
+                    }
                 }
-            });
+
+            if (wordCards === 'true') {
+                var wordCardIndex = -1;
+                document.body.addEventListener('keydown', event => listener(event, true));
+            } else {
+                translateWordInput.focus();
+                translateWordInput.addEventListener('keydown', event => listener(event, false));
+            }
+
         </script>
     </div>
     <script src="{{url_for('static', filename='scripts/theme.js')}}"></script>

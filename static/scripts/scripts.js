@@ -503,7 +503,7 @@ function setOriginalWord(lang) {
 
     originalWord.innerHTML = wordInfo[lang != 'RU' ? 'original' : 'translate'];
 
-    console.log(originalWord.innerHTML)
+    // console.log(originalWord.innerHTML)
     transcriptionWord.innerHTML = wordInfo.transcription ? wordInfo.transcription : '';
 }
 
@@ -584,6 +584,7 @@ function checkTranslateWord(checkBtn) {
                         setWordCardStyle(cards[idx], '5px solid DarkCyan', '50%', '25%');
                         idx++;
                     }
+                    wordCardIndex = -1;
                 }
 
             } else {
