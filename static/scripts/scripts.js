@@ -432,9 +432,15 @@ function startGame(foreignLang, is_forgotten=false) {
     if (is_forgotten) {
 
         var forgottenWords = listWords.filter(wordInfo => wordInfo.is_forgotten == 1);
+        var forgottenLen = forgottenWords.length;
 
-        if (forgottenWords.length == 0) {
+        if (forgottenLen == 0) {
             alert('У Вас нет забывающихся слов');
+            return;
+        }
+
+        if (document.getElementById('word-cards').checked && forgottenLen < 4) {
+            alert(`Количество забывающихся слов: ${forgottenLen}.\nНужно минимум 4 слова чтобы начать игру с карточками.`)
             return;
         }
 
