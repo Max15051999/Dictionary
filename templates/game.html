@@ -35,10 +35,10 @@
             </div>
 
             <div class="word-choose-cards" style="display: none">
-                <div class="word-card" onclick="readWordCardText(this);">...</div><br>
-                <div class="word-card" onclick="readWordCardText(this);">...</div><br>
-                <div class="word-card" onclick="readWordCardText(this);">...</div><br>
-                <div class="word-card" onclick="readWordCardText(this);">...</div><br>
+                <div class="word-card" onclick="readWordCardText(this);" data-idx="0">...</div><br>
+                <div class="word-card" onclick="readWordCardText(this);" data-idx="1">...</div><br>
+                <div class="word-card" onclick="readWordCardText(this);" data-idx="2">...</div><br>
+                <div class="word-card" onclick="readWordCardText(this);" data-idx="3">...</div><br>
                 <br><br>
             </div>
 
@@ -63,6 +63,8 @@
                 setWordCardStyle(wordCard, '10px solid Red', '60%', '20%');
 
                 translateWordInput.value = wordCard.innerHTML;
+
+                wordCardIndex = +wordCard.getAttribute('data-idx');
             }
 
             function checkBack() {
