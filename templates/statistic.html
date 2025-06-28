@@ -54,6 +54,9 @@
                     listWords = copyWords;
             }
 
+            if (sessionStorage.getItem('btn_word_cards_checked') == 'true')
+                sessionStorage.setItem('word_cards', listWords.length >= 4);
+
             for (var i = listWords.length - 1; i >= 0; i--)
                 listWords[i].is_wrong_answer = null;
 
@@ -90,9 +93,6 @@
                     sessionStorage.copyWords = JSON.stringify({copy_words: listWords});
 
                 listWords = listWords.filter(wordInfo => wordInfo.is_wrong_answer);
-
-                if (listWords.length < 4)
-                    sessionStorage.setItem('word_cards', false);
 
                 restartGame(false);
                 // sessionStorage.words = JSON.stringify({words: listWords});

@@ -469,7 +469,11 @@ function startGame(foreignLang, is_forgotten=false) {
             window.location.href = window.location.href + 'game/';
         }
     }
-    sessionStorage.setItem('word_cards', document.getElementById('word-cards').checked)
+
+    var isChecked = document.getElementById('word-cards').checked;
+
+    sessionStorage.setItem('word_cards', isChecked)
+    sessionStorage.setItem('btn_word_cards_checked', isChecked)
 }
 
 function shuffle(listWords=null) {
