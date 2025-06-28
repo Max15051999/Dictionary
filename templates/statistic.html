@@ -31,7 +31,7 @@
             </tr>
         </table>
         <hr><br><br><br>
-        <button onclick="restartGame();" title="Нажмите <Enter>">Начать заново</button><br><br>
+        <button onclick="restartGame(true);" title="Нажмите <Enter>">Начать заново</button><br><br>
 
         {% if wrong > 0 %}
             <button onclick="updateForgottenWords(this);">Добавить в забывающиеся</button><br><br>
@@ -46,7 +46,14 @@
             window.location.href = '../../../../../';
         }
 
-        function restartGame() {
+        function restartGame(withAllWords) {
+            if (withAllWords) {
+                var copyWords = JSON.parse(sessionStorage.getItem('copyWords')).copy_words;
+
+                if (copyWords.length > 0)
+                    listWords = copyWords;
+            }
+
             for (var i = listWords.length - 1; i >= 0; i--)
                 listWords[i].is_wrong_answer = null;
 
@@ -79,12 +86,15 @@
             wrongAnswers.style.cursor = 'pointer';
             wrongAnswers.title = 'Повторить с этими словами';
             wrongAnswers.onclick = () => {
+                if (JSON.parse(sessionStorage.getItem('copyWords')).copy_words.length == 0)
+                    sessionStorage.copyWords = JSON.stringify({copy_words: listWords});
+
                 listWords = listWords.filter(wordInfo => wordInfo.is_wrong_answer);
 
                 if (listWords.length < 4)
                     sessionStorage.setItem('word_cards', false);
 
-                restartGame();
+                restartGame(false);
                 // sessionStorage.words = JSON.stringify({words: listWords});
                 // window.location.href = '../../../../';
             }
@@ -96,7 +106,7 @@
 
             switch(event.code) {
                 case 'Enter':
-                    restartGame();
+                    restartGame(true);
                     break;
                 case 'KeyQ':
                     back();

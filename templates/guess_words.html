@@ -72,6 +72,7 @@
     {% endif %}
     <script src="{{url_for('static', filename='scripts/theme.js')}}"></script>
     <script>
+        sessionStorage.copyWords = JSON.stringify({copy_words: []});
         // setTotalWordsInDict(document.getElementById('dict_choose'));
     </script>
 </body>
