@@ -51,13 +51,17 @@
             <br><br><br>
 
             <div id="list-words" style="display: none">
+                <script>
+                    var parser = new DOMParser();
+                    var parse = (word) => parser.parseFromString(word, 'text/html').body.innerHTML;
+                </script>
                 {% for word in words %}
                     <div class="word" onclick="setWordChecked({{loop.index0}});">
                         <input id="word_{{loop.index0}}" class="word-checkbox" type="checkbox" value="{{word.0}}" checked disabled>
-                        <label id="word_label_{{loop.index0}}" style="font-size: 40px" data-trans="{{word.1}}">{{word.0}}</label><br><br>
+                        <label style="font-size: 40px" data-trans="{{word.1}}">{{word.0}}</label><br><br>
                     </div><br>
                     <script>
-                        addWordsToList(-1, '{{word.0}}', '{{word.1}}', '{{word.2}}', '{{word.3}}', '{{word.4}}', {{word.5}}, {{word.6}});
+                        addWordsToList(-1, parse('{{word.0}}'), parse('{{word.1}}'), parse('{{word.2}}'), '{{word.3}}', '{{word.4}}', {{word.5}}, {{word.6}});
                     </script>
                 {% endfor %}
                 <script>
