@@ -1,4 +1,4 @@
-
+'use strict'
 
 function addSpecialSymbolInInput(elem) {
     var symbol = elem.textContent || elem.innerText;

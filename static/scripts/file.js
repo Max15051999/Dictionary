@@ -1,3 +1,5 @@
+'use strict'
+
 var listOfWords = []
 var listOfSelectedWords = []
 // listOfSelectedWords.unshift('Original,Translate')

@@ -1,3 +1,5 @@
+'use strict'
+
 function changeLangs() {
     var firstLabel = document.getElementById('first-lang');
     var secondLabel = document.getElementById('second-lang');

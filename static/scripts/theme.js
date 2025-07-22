@@ -1,3 +1,5 @@
+'use strict'
+
 var color = localStorage.getItem('bg');
 
 if (color != null) {
