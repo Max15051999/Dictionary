@@ -532,7 +532,7 @@ function checkTranslateWord(checkBtn) {
         translateWordValue = translateWordValue.toLocaleLowerCase()
         translateWordValue = translateWordValue.replaceAll('ё', 'е');
         var sourceLang = sessionStorage.getItem('source_lang');
-        var answer = listWords[wordIndex - 1][sourceLang == 'RU' ? 'original' : 'translate'];
+        var answer = listWords[wordIndex - 1][sourceLang == 'RU' ? 'original' : 'translate'].trim();
         var rightAnswerLabel = document.getElementById('right-answer');
 
         var isAnswerRight = false;
