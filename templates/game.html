@@ -20,7 +20,9 @@
 <!--        <label id="wrong_total">0</label><br><br>-->
         <img id="question-status" src="{{url_for('static', filename='img/thinking_icon.png')}}"/><br>
 
-        {% include 'special_symbols.html' %}
+        {% if lang_code == 'DE' %}
+            {% include 'special_symbols.html' %}
+        {% endif %}
 
         <label id="right-answer" style="color: green; font-size: 30px;"></label>
         <br><br><br>

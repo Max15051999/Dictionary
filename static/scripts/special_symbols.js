@@ -13,3 +13,8 @@ function showHideSpecialSymbols() {
     else
         divWithSpecialSymbols.style.display = 'none';
 }
+
+function showHideSpecialSymbolsBtn(lang, specialSymbolsBtn, specialSymbols) {
+    specialSymbolsBtn.style.visibility = lang === 'DE' ? 'visible' : 'hidden';
+    specialSymbols.style.visibility = lang === 'DE' ? 'visible' : 'hidden';
+}

@@ -6,6 +6,7 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/dictionary.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/index.css') }}">
     <script src="{{url_for('static', filename='scripts/scripts.js')}}"></script>
+    <script src="{{url_for('static', filename='scripts/special_symbols.js')}}"></script>
 </head>
 <body oncontextmenu="return false;">
     {% if is_err %}
@@ -36,7 +37,11 @@
                 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                 <img id="saying-words-img" title="Произнести все слова по порядку" src="{{url_for('static', filename='img/start_saying_words.png')}}" onclick="startStopSayingAllWords();">
                 <br><br>
-                <input id="search-input" type="text" placeholder="Введите слово...">
+                {% if dictionary_lang_code == 'DE' %}
+                    {% include 'special_symbols.html' %}
+                    <br><br>
+                {% endif %}
+                <input id="original-input-word" type="text" placeholder="Введите слово...">
                 <img id="search-img" title="Поиск" src="{{url_for('static', filename='img/search_icon.png')}}" onclick="findWordCard();">
                 <br><br>
                 <label>Сортировать по</label><br><br>
@@ -105,7 +110,7 @@
         </div>
     {% endif %}
     <script>
-        var searchInput = document.getElementById('search-input');
+        var searchInput = document.getElementById('original-input-word');
         var checkedWords = document.querySelectorAll('.word-checker');
 
         if (searchInput) {

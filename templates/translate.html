@@ -5,6 +5,7 @@
     <title>Translate</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/translate.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/index.css') }}">
+    <script src="{{url_for('static', filename='scripts/special_symbols.js')}}"></script>
 </head>
 <body>
     {% if is_err %}
@@ -40,11 +41,16 @@
         {% endif %}
 
         {% include 'special_symbols.html' %}
+        <script>
+            var specialSymbolsBtn = document.getElementById('special-symbols-btn');
+            var specialSymbols = document.getElementById('special-symbols');
+            showHideSpecialSymbolsBtn('{{_from}}', specialSymbolsBtn, specialSymbols);
+        </script>
 
         <br><br>
         <table id="trans-table">
             <tr>
-                <td><select id="original-lang" onchange="setForeignLang(event);">
+                <td><select id="original-lang" onchange="setForeignLang(event, showHideSpecialSymbolsBtn, [this.options[this.selectedIndex].getAttribute('name'), specialSymbolsBtn, specialSymbols]);">
                     {% for foreign_lang in foreign_langs|items %}
                         <option name="{{foreign_lang.0}}">{{foreign_lang.1}}</option>
                     {% endfor %}
@@ -99,6 +105,5 @@
     </script>
     <script src="{{url_for('static', filename='scripts/scripts.js')}}"></script>
     <script src="{{url_for('static', filename='scripts/theme.js')}}"></script>
-    <script src="{{url_for('static', filename='scripts/special_symbols.js')}}"></script>
 </body>
 </html>

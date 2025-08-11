@@ -5,6 +5,7 @@
     <title>{{title}}</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/index.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/add_change_word.css') }}">
+    <script src="{{url_for('static', filename='scripts/special_symbols.js')}}"></script>
 </head>
 <body>
     <div class="container">
@@ -17,12 +18,16 @@
         {% endif %}
 
         {% include 'special_symbols.html' %}
-
+        <script>
+            var specialSymbolsBtn = document.getElementById('special-symbols-btn');
+            var specialSymbols = document.getElementById('special-symbols');
+            showHideSpecialSymbolsBtn('EN', specialSymbolsBtn, specialSymbols);
+        </script>
         <form action="." method="post">
             <input type="number" value="{{word_id}}" hidden="hidden">
 
             <label class="label" for="original-input-word">Слово на
-                <select id="langs-selector" name="lang">
+                <select id="langs-selector" name="lang" onchange="showHideSpecialSymbolsBtn(event.target.value, specialSymbolsBtn, specialSymbols);">
                     {% for lang in my_langs|items  %}
                         <option value="{{lang.0}}">{{lang.1}}</option>
                     {% endfor %}
@@ -44,7 +49,6 @@
         <a href="{{href_back}}"><button>Назад</button></a>
     </div>
     <script src="{{url_for('static', filename='scripts/theme.js')}}"></script>
-    <script src="{{url_for('static', filename='scripts/special_symbols.js')}}"></script>
     <script src="{{url_for('static', filename='scripts/scripts.js')}}"></script>
 
     {% if lang %}

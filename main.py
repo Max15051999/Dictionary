@@ -128,7 +128,7 @@ def download_dictionary(lang: str):
   return render_template('download_upload_dictionary.html', title=title, words=words)
 
 
-@app.route('/dictionary/<lang>//upload/', methods=['GET'])
+@app.route('/dictionary/<lang>/upload/', methods=['GET'])
 def upload_dictionary(lang: str):
   title = f'Загрузить словарь на {lang}'
   return render_template('download_upload_dictionary.html', title=title, lang=lang)
