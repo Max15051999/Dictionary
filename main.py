@@ -89,7 +89,7 @@ def guess_words(lang_code: str):
 def game(lang_code: str):
   lang_name = ForeignLang.get_lang_by_code(lang_code)
   lang_name = lang_name[:-2] + 'ом' if lang_name.endswith('ий') else lang_name
-  return render_template('game.html', lang=lang_name)
+  return render_template('game.html', lang=lang_name, lang_code=lang_code)
 
 
 @app.route('/guess_words/<lang_code>/game/statistic/<total_words>/<right_answers_count>/<wrong_answers_count>/',
