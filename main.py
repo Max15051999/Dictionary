@@ -16,7 +16,8 @@ app = Flask(__name__)
 @app.route('/')
 def index():
   db = help_funcs.connect_to_db()
-  db.create_table(config.TABLE_NAME, config.TABLE_FIELDS)
+  db.create_table(config.WORDS_TABLE_NAME, config.TABLE_FIELDS)
+  db.query_execute(queries.CREATE_NOTES_TABLE)
 
   return render_template('index.html')
 
@@ -47,10 +48,31 @@ def my_dictionaries():
 def show_dictionary(dictionary_lang_code: str):
   db = help_funcs.connect_to_db()
 
-  words = db.query_execute(queries.SELECT_ALL_WORDS, params=(dictionary_lang_code,), is_fetch_all=True)
+  words = db.query_execute(queries.SELECT_ALL_WORDS_BY_LANG, params=(dictionary_lang_code,), is_fetch_all=True)
 
   return render_template('dictionary.html', words=words, dictionary_lang_name=ForeignLang.get_lang_by_code(dictionary_lang_code),
                          dictionary_lang_code=dictionary_lang_code, href_back='/dictionaries/')
+
+
+@app.route('/langs_notes/', methods=['GET'])
+def my_notes():
+  db = help_funcs.connect_to_db()
+
+  my_dicts = db.query_execute(queries.GET_DICTIONARIES, is_fetch_all=True)
+
+  code_name_dict_dct = {my_dict[0]: ForeignLang.get_lang_by_code(my_dict[0], word_end='е') for my_dict in my_dicts}
+  return render_template('dictionary_type.html', my_dicts=code_name_dict_dct, title='Мои заметки',
+                         next_page='langs_notes')
+
+
+@app.route('/langs_notes/<notes_lang_code>/', methods=['GET'])
+def show_note(notes_lang_code: str):
+  db = help_funcs.connect_to_db()
+
+  notes = db.query_execute(queries.SELECT_ALL_NOTES_BY_LANG, params=(notes_lang_code,), is_fetch_all=True)
+
+  return render_template('notes.html', notes=notes, notes_lang_name=ForeignLang.get_lang_by_code(notes_lang_code, word_end='ком'),
+                         notes_lang_code=notes_lang_code, href_back='/langs_notes/')
 
 
 @app.route('/guess_words/', methods=['GET'])
@@ -264,7 +286,6 @@ def add_word_in_db(word1: str, word2: str, first_lang: str, second_lang: str):
 @app.route('/delete_word/', methods=['POST'])
 def delete_word():
   db = help_funcs.connect_to_db()
-  # print('DELETE ALL')
 
   data: dict = json.loads(request.data.decode())
 
@@ -276,9 +297,28 @@ def delete_word():
     db.query_execute(queries.DELETE_WORD_BY_ID, params=word_remove_ids, is_ext=True)
     # print('DELETE WORD:', word_id)
   else:
-    db.query_execute(queries.DELETE_ALL_WORDS, params=(lang,))
+    db.query_execute(queries.DELETE_ALL_WORDS_BY_LANG, params=(lang,))
 
   return show_dictionary(lang)
+
+
+@app.route('/delete_note/', methods=['POST'])
+def delete_note():
+  db = help_funcs.connect_to_db()
+
+  data: dict = json.loads(request.data.decode())
+
+  # print('DATA:', data)
+  note_remove_ids: list = data['noteIds']
+  lang: str = data['lang']
+
+  if note_remove_ids:
+    db.query_execute(queries.DELETE_NOTE_BY_ID, params=note_remove_ids, is_ext=True)
+    # print('DELETE WORD:', word_id)
+  else:
+    db.query_execute(queries.DELETE_ALL_NOTES_BY_LANG, params=(lang,))
+
+  return show_note(lang)
 
 
 @app.route('/dictionary/<dictionary_lang>/change/<word_id>/<word_en>/<word_ru>/<transcription>/',
@@ -298,7 +338,7 @@ def change_word(dictionary_lang: str, word_id: str, word_en: str, word_ru: str, 
 
     if not is_err:
       db = help_funcs.connect_to_db()
-      db.query_execute(queries.UPDATE_WORD, params=(word_en, word_ru, transcription, lang_code, word_id))
+      db.query_execute(queries.UPDATE_WORD_BY_ID, params=(word_en, word_ru, transcription, lang_code, word_id))
       msg = 'Слово успешно изменено'
     else:
       msg = 'Ошибка изменения слова'
@@ -334,6 +374,59 @@ def add_new_word():
                                   for lang in ForeignLang}, lang=lang, href_back='/')
 
 
+@app.route('/langs_notes/<lang>/add_new_note/', methods=['GET', 'POST'])
+def add_new_note(lang: str):
+  title = 'Добавить заметку'
+  msg = ''
+
+  if request.method == 'POST':
+    data: dict = request.form
+
+    note_title: str = data.get('note-title').strip()
+    note_content: str = data.get('note-content').strip()
+
+    if not note_title or not note_content:
+      msg = 'Ошибка добавления заметки'
+    else:
+      help_funcs.add_note_in_db(note_title, note_content, lang)
+      msg = 'Заметка успешно добавлена в словарь'
+
+  return render_template('add_change_note.html', lang=lang, title=title, msg=msg, href_back='..')
+
+
+@app.route('/langs_notes/<lang>/change_note/<note_id>/', methods=['GET', 'POST'])
+def change_note(lang: str, note_id: str):
+  title = 'Изменить заметку'
+  msg = ''
+  _id = int(note_id)
+  note_title, note_content = '', ''
+
+  if request.method == 'GET':
+    db = help_funcs.connect_to_db()
+    note_info = db.query_execute(queries.SELECT_NOTE_BY_ID, params=(_id,), is_fetch_one=True)
+
+    if note_info is None:
+      msg = f'Заметка с id = {_id} не найдена!'
+    else:
+      _, note_title, note_content, _, _ = note_info
+
+  else:
+    data: dict = request.form
+
+    note_title = data.get('note-title').strip()
+    note_content = data.get('note-content').strip()
+
+    if not note_title or not note_content:
+      msg = 'Ошибка изменения заметки'
+    else:
+      db = help_funcs.connect_to_db()
+      db.query_execute(queries.UPDATE_NOTE_BY_ID, params=(note_title, note_content, lang, _id))
+      msg = 'Заметка успешно изменена'
+
+  return render_template('add_change_note.html', lang=lang, title=title, msg=msg,
+                         note_title=note_title, note_content=note_content, href_back='../..')
+
+
 @app.route('/dictionary/<lang>/search/<word_part>/', methods=['GET'])
 def search_word_card(lang: str, word_part: str):
   words = help_funcs.search_words(word_part, lang)
@@ -345,6 +438,20 @@ def search_word_card(lang: str, word_part: str):
 
   return render_template('dictionary.html', words=words,
                href_back='../../', is_err=is_err, is_search=is_search, dictionary_lang_code=lang)
+
+
+@app.route('/langs_notes/<lang>/search/<word_part>/', methods=['GET'])
+def search_note_card(lang: str, word_part: str):
+  notes: list = help_funcs.search_notes(word_part, lang)
+  is_err = False
+  is_search = True
+
+  if not notes:
+    is_err = True
+
+  return render_template('notes.html', notes=notes, notes_lang_name=ForeignLang.get_lang_by_code(lang, word_end='ком'),
+               href_back='../../', is_err=is_err, is_search=is_search, notes_lang_code=lang)
+
 
 
 @app.route('/update_service/<service>/<first_lang>/<second_lang>/', methods=['GET'])
@@ -371,7 +478,3 @@ def upload_file(lang: str):
   remove(file_full_path)
 
   return render_template('dictionary.html', upload_new_words=True, lang=lang)
-
-
-if __name__ == '__main__':
-  app.run(debug=True, host='0.0.0.0', port=8000)

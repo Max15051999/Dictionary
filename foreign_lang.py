@@ -7,10 +7,11 @@ class ForeignLang(Enum):
 	DE = 'Немецкий'
 
 	@staticmethod
-	def get_lang_by_code(code: str) -> Union[str, None]:
+	def get_lang_by_code(code: str, word_end=None) -> Union[str, None]:
 		for _lang in ForeignLang:
 			if code == _lang.name:
-				return _lang.value
+				val = _lang.value
+				return val if word_end is None else (val[:-len(word_end)] + word_end) if val.endswith('кий') else val
 		return None
 
 	@staticmethod

@@ -137,7 +137,7 @@ function deleteWord(wordId, wordEn = '', lang = '') {
 
     var currentUrl = window.location.href;
 
-    if (wordId == 0) {
+    if (wordId === 0) {
         // var wordCheckers = document.getElementsByClassName('word-checker');
 
         checkedWords.forEach((word, idx) => {
@@ -171,6 +171,54 @@ function deleteWord(wordId, wordEn = '', lang = '') {
                 'Content-Type': 'application/json',
               },
               body: JSON.stringify({wordIds: selectedWordIds, lang: lang})
+        });
+
+        setTimeout(() => {
+            window.location.href = currentUrl;
+        }, 50)
+    }
+}
+
+function deleteNote(noteId, noteTitle = '', lang = '') {
+    var msg = `Вы действительно хотите удалить заметку ${noteTitle}?`;
+    var selectedNoteIds = [];
+
+    var currentUrl = window.location.href;
+
+    if (noteId === 0) {
+        // var wordCheckers = document.getElementsByClassName('word-checker');
+
+        checkedNotes.forEach((note, idx) => {
+            if (note.checked)
+                selectedNoteIds.push([note.getAttribute('note_id')]);
+        });
+
+//        var idx = 0;
+//        for (var wordChecker of wordCheckers) {
+//            if (wordChecker.checked)
+//                selectedWordIds.push([listWords[idx].id]);
+//            idx++;
+//        }
+
+        if (selectedNoteIds.length > 0)
+            msg = 'Вы действительно хотите удалить выделенные заметки?';
+        else
+            msg = 'Вы действительно хотите удалить все заметки из словаря?';
+    } else {
+        selectedNoteIds.push([noteId]);
+    }
+
+    // console.log(lang)
+
+    if (confirm(msg)) {
+        lang = lang == '' ? 'default' : lang;
+
+        fetch(`/delete_note/`, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({noteIds: selectedNoteIds, lang: lang})
         });
 
         setTimeout(() => {
@@ -336,6 +384,24 @@ function sortWords(sortType = 'alphabet') {
         // wordDeleteImgs[i].title = 'HELL';
         wordChangeLinks[i].href = `${window.location.href}change/${wordInfo.id}/${original}/${translate}/${transcription ? transcription : 'ES'}/`;
     }
+}
+
+function sortNotes(sortType = 'alphabet', notesList) {
+
+    if (sortType == 'alphabet')
+        notesList = notesList.sort((noteInfo, noteInfo2) => noteInfo['title'].localeCompare(noteInfo2['title']));
+    else
+        notesList = notesList.sort((noteInfo, noteInfo2) => noteInfo2['date_to_add'] - noteInfo['date_to_add']);
+
+    notesList.forEach((noteInfo, i) => {
+        var noteId = noteInfo['id'];
+        var noteTitle = noteInfo['title'];
+
+        noteTitles[i].innerHTML = noteTitle;
+        noteDates[i].innerHTML = getFormattedDateString(new Date(noteInfo['date_to_add'] * 1000));
+        noteDeleteImgs[i].setAttribute('onclick', `deleteNote(${noteId}, '${noteTitle}');`);
+        noteChangeLinks[i].href = `${window.location.href}change_note/${noteId}`;
+    });
 }
 
 function clickOnGetWordsFromEndCheckbox(isChecked) {

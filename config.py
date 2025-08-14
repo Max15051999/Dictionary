@@ -15,7 +15,8 @@ GOOGLE_API = f'https://script.google.com/macros/s/{GOOGLE_API_KEY}/exec?q=%s&tar
 SERVICE_JSON_NAME = 'service/service.json'
 FILES_DIR_PATH = 'files/'
 GOOGLE_SEVICE_NAME = 'google'
-WORDHUNT_SERVICE_NAME = 'wordhunt'
+WORDS_TABLE_NAME = 'words'
+NOTES_TABLE_NAME = 'notes'
 
 RESPONSE_OK_STATUS_CODE = 200
 

@@ -70,6 +70,14 @@ def add_word_in_db(original_word: str, word_ru: str, transcription: str, lang: s
 	db = connect_to_db()
 	db.query_execute(queries.INSERT_NEW_WORD, params=(original_word, word_ru, transcription, lang, current_date))
 
+
+def add_note_in_db(note_title: str, note_content: str, lang: str):
+	current_date = datetime.now().strftime(config.CURRENT_DATE_PATTERN)
+
+	db = connect_to_db()
+	db.query_execute(queries.INSERT_NEW_NOTE, params=(note_title, note_content, lang, current_date))
+
+
 def search_words(word_part: str, lang: str) -> List[Tuple[int, str, str, str, int]]:
 	db = connect_to_db()
 
@@ -95,6 +103,20 @@ def search_words(word_part: str, lang: str) -> List[Tuple[int, str, str, str, in
 	return find_words
 
 
+def search_notes(word_part: str, lang: str) -> List[Tuple[int, str, str, str, int]]:
+	db = connect_to_db()
+
+	is_first_letter = len(word_part) == 1
+	word_part = word_part.capitalize()
+
+	query = queries.GET_NOTE_FULL_INFO_BY_TITLE(is_first_letter)
+	find_notes: list = db.query_execute(query, params=(word_part, lang), is_fetch_all=True)
+
+	if not find_notes:
+		word_part = word_part.lower()
+		find_notes: list = db.query_execute(query, params=(word_part, lang), is_fetch_all=True)
+
+	return  find_notes
 
 def prepare_words_and_check(req) -> Tuple[bool, str, str, str, str]:
 	data = req.form

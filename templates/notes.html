@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" charset="UTF-8">
+    <title>My Notes</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/notes.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/index.css') }}">
+</head>
+<body>
+    {% if is_err %}
+        <script>
+            alert('Совпадений не найдено!');
+            window.location.href = '{{href_back}}';
+        </script>
+    {% else %}
+        <div class="container">
+            {% include 'theme.html' %}
+            <h1>{{ 'Найдено' if is_search else 'Заметки на ' + notes_lang_name }} ({{notes|length}})</h1>
+
+            {% if notes|length > 0 %}
+                <a href="/langs_notes/"><img title="К выбору языка заметок" src="{{url_for('static', filename='img/back_icon.png')}}"></a>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                <img title="Удалить всё" src="{{url_for('static', filename='img/delete_all_icon.png')}}" onclick="deleteNote(0, '', '{{notes_lang_code}}');">
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                <a href="/langs_notes/{{notes_lang_code}}/add_new_note/"><img title="Добавить заметку" src="{{url_for('static', filename='img/add_note_icon.png')}}"></a>
+                <br><br>
+                <input id="note_input" type="text" placeholder="Введите название...">
+                <img id="search-img" title="Поиск" src="{{url_for('static', filename='img/search_icon.png')}}" onclick="findWordCard();">
+                <br><br>
+                <label>Сортировать по</label><br><br>
+                <input id="alphabet" type="radio" value="alphabet" name="sort_by" onclick="sortNotes('alphabet', notesList);"><label for="alphabet">алфавиту</label>
+                <input id="date_to_add" type="radio" value="date_to_add" name="sort_by" onclick="sortNotes('date', notesList);"><label for="date_to_add">Дате добавления</label>
+                {% include 'up_down_scroll.html' %}
+                 <br><br><br>
+
+                <div style="margin-left: 80%;">
+                    <input type="button" value="Выделить всё" onclick="checkedNotes.forEach(item => item.checked = true);">
+                    <input type="button" value="Снять выделение" onclick="checkedNotes.forEach(item => item.checked = false);">
+                </div>
+                <script>
+                    var notesList = [];
+                </script>
+            {% else %}
+                <a href="/langs_notes/{{notes_lang_code}}/add_new_note/"><img title="Добавить заметку" src="{{url_for('static', filename='img/add_note_icon.png')}}"></a>
+            {% endif %}
+
+            <table id="notes-table">
+                {% for note in notes %}
+                <tr>
+                    <td>
+                        <div class="note-card">
+                            <h3 class="title">{{note.1}}</h3>
+                            <label class="date-to-add">{{note.4}}</label><br><br>
+                            <img class="note-delete" title="Удалить" id="del_note_{{note.0}}" src="{{url_for('static', filename='img/delete_word_icon.png')}}" onclick="deleteNote({{note.0}}, '{{note.1}}', '{{notes_lang_code}}');"/>
+                            <a class="note-change" href="/langs_notes/{{notes_lang_code}}/change_note/{{note.0}}/"><img title="Просмотр/изменение" src="{{url_for('static', filename='img/change_word_icon.png')}}"/></a>
+                        </div>
+                    </td>
+                    <td>
+                        <input id="note-{{loop.index0}}" class="note-checker" data-note_id="{{note.0}}" type="checkbox">
+                        <label for="note-{{loop.index0}}">Выделить</label>
+                    </td>
+                </tr>
+                <script>
+                    var noteId = {{note.0}};
+                    var noteTitle = '{{note.1}}';
+                    var noteContent = '{{note.2}}';
+                    var noteLang = '{{note.3}}';
+                    var noteDateToAdd = new Date('{{note.4}}').getTime() / 1000;
+
+                    notesList.push(
+                        {
+                            'id': noteId,
+                            'title': noteTitle,
+                            'content': noteContent,
+                            'lang': noteLang,
+                            'date_to_add': noteDateToAdd
+                        }
+                    );
+                </script>
+                {% endfor %}
+            </table>
+            <hr><br><br><br>
+            <a href="{{href_back}}"><button>Назад</button></a>
+        </div>
+    {% endif %}
+    <br><br>
+    <script>
+        var searchInput = document.getElementById('note_input');
+        var checkedNotes = document.querySelectorAll('.note-checker');
+
+        if (searchInput) {
+            searchInput.focus();
+
+            searchInput.addEventListener('keydown', (event) => {
+                if (event.code == 'Enter') {
+                    findWordCard();
+                }
+
+            });
+        }
+
+        var noteTitles = document.getElementsByClassName('title');
+        var noteDates = document.getElementsByClassName('date-to-add');
+        var noteDeleteImgs = document.getElementsByClassName('note-delete');
+        var noteChangeLinks = document.getElementsByClassName('note-change');
+    </script>
+    <script src="{{url_for('static', filename='scripts/theme.js')}}"></script>
+    <script src="{{url_for('static', filename='scripts/scripts.js')}}"></script>
+</body>
+</html>
