@@ -9,7 +9,7 @@ class DB:
 	def __init__(self, db_name: str):
 		self.__coon = sqlite3.connect(db_name)
 		self.__cursor = self.__coon.cursor()
-		self.create_table(config.TABLE_NAME, config.TABLE_FIELDS)
+		self.create_table(config.WORDS_TABLE_NAME, config.TABLE_FIELDS)
 
 	def create_table(self, table_name: str, fields: Dict[str, str]):
 		fields_str = '( '
