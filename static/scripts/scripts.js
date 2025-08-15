@@ -369,7 +369,7 @@ function sortWords(sortType = 'alphabet') {
         var transcription = wordInfo.transcription;
         var lang = wordInfo.lang;
 
-        wordSayImgs[i].setAttribute('onclick', `sayWord('${original}', '${lang}');`)
+        wordSayImgs[i].setAttribute('onclick', `sayWord("${original}", '${lang}');`)
         wordOriginals[i].innerHTML = original;
         wordOriginals[i].setAttribute('data-trans', translate);
         wordTranscriptions[i].innerHTML = transcription;
@@ -378,7 +378,7 @@ function sortWords(sortType = 'alphabet') {
         wordDates[i].innerHTML = wordFormattedDate;
 
         // wordDeleteImgs[i].removeAttribute('onclick');
-        wordDeleteImgs[i].setAttribute('onclick', `deleteWord(${wordInfo.id}, '${original}')`);
+        wordDeleteImgs[i].setAttribute('onclick', `deleteWord(${wordInfo.id}, "${original}")`);
 
         // wordDeleteImgs[i].onclick = () => deleteWord(wordInfo.id, original);
         // wordDeleteImgs[i].title = 'HELL';
@@ -399,7 +399,7 @@ function sortNotes(sortType = 'alphabet', notesList) {
 
         noteTitles[i].innerHTML = noteTitle;
         noteDates[i].innerHTML = getFormattedDateString(new Date(noteInfo['date_to_add'] * 1000));
-        noteDeleteImgs[i].setAttribute('onclick', `deleteNote(${noteId}, '${noteTitle}');`);
+        noteDeleteImgs[i].setAttribute('onclick', `deleteNote(${noteId}, "${noteTitle}");`);
         noteChangeLinks[i].href = `${window.location.href}change_note/${noteId}`;
     });
 }
