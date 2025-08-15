@@ -66,7 +66,7 @@ def my_notes():
 
 
 @app.route('/langs_notes/<notes_lang_code>/', methods=['GET'])
-def show_note(notes_lang_code: str):
+def show_notes(notes_lang_code: str):
   db = help_funcs.connect_to_db()
 
   notes = db.query_execute(queries.SELECT_ALL_NOTES_BY_LANG, params=(notes_lang_code,), is_fetch_all=True)
@@ -318,7 +318,7 @@ def delete_note():
   else:
     db.query_execute(queries.DELETE_ALL_NOTES_BY_LANG, params=(lang,))
 
-  return show_note(lang)
+  return show_notes(lang)
 
 
 @app.route('/dictionary/<dictionary_lang>/change/<word_id>/<word_en>/<word_ru>/<transcription>/',
@@ -425,6 +425,24 @@ def change_note(lang: str, note_id: str):
 
   return render_template('add_change_note.html', lang=lang, title=title, msg=msg,
                          note_title=note_title, note_content=note_content, href_back='../..')
+
+
+@app.route('/langs_notes/<lang>/show_note/<note_id>/', methods=['GET'])
+def show_note(lang: str, note_id: str):
+  _id = int(note_id)
+  msg = ''
+  note_title, note_content = '', ''
+
+  db = help_funcs.connect_to_db()
+  note_info = db.query_execute(queries.SELECT_NOTE_BY_ID, params=(_id,), is_fetch_one=True)
+
+  if note_info is None:
+    msg = f'Заметка с id = {_id} не найдена!'
+  else:
+    _, note_title, note_content, _, _ = note_info
+
+  return render_template('show_note.html', note_title=note_title, note_content=note_content, msg=msg)
+
 
 
 @app.route('/dictionary/<lang>/search/<word_part>/', methods=['GET'])
