@@ -441,7 +441,8 @@ def show_note(lang: str, note_id: str):
   else:
     _, note_title, note_content, _, _ = note_info
 
-  return render_template('show_note.html', note_title=note_title, note_content=note_content, msg=msg)
+  return render_template('show_note.html', note_title=note_title, note_content=note_content,
+                         msg=msg, note_lang_name=ForeignLang.get_lang_by_code(lang, word_end='ком'))
 
 
 
