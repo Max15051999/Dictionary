@@ -13,6 +13,7 @@
             font-size: 30px;
             border: 5px solid green;
             border-radius: 20px;
+            text-align: left;
         }
     </style>
 </head>
@@ -28,12 +29,42 @@
                 window.location.href = '../../';
             </script>
         {% endif %}
+
+        <input type="checkbox" id="new-line-chk" disabled onclick="splitText(newLineSymbolInput.value, this.checked);">
+        <label for="new-line-chk">Переносить на новую строку после</label>
+        <input type="text" id="new-line-symbol-input">
+
         <h1>Заметка на {{note_lang_name}}</h1>
         <h1>{{note_title}}</h1>
-        <p class="note-content">{{note_content}}</p>
+        <p id="note-content-tag" class="note-content">{{note_content}}</p>
         <br><br><br>
         <a href="../../"><button>Назад</button></a>
     </div>
     <script src="{{url_for('static', filename='scripts/theme.js')}}"></script>
+    <script>
+        var newLineSymbolInput = document.getElementById('new-line-symbol-input');
+        var newLineChk = document.getElementById('new-line-chk');
+        var noteContentTag = document.getElementById('note-content-tag');
+
+        newLineSymbolInput.onchange = function() {
+            newLineChk.disabled = !(this.value.length > 0);
+
+            if (newLineChk.checked)
+                newLineChk.checked = this.value.length > 0;
+        };
+
+        function splitText(splitter, isChecked=true) {
+
+            if (isChecked) {
+                var splitterText = `{{note_content}}`.split(splitter).join('<br>');
+                noteContentTag.innerHTML = splitterText;
+            } else {
+                var splitterText = `{{note_content}}`.split('<br>').join(splitter);
+                noteContentTag.innerHTML = splitterText;
+            }
+
+
+        }
+    </script>
 </body>
 </html>
