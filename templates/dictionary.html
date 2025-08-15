@@ -48,16 +48,15 @@
                 <input id="alphabet" type="radio" value="alphabet" name="sort_by" onclick="sortWords();"><label for="alphabet">алфавиту</label>
                 <input id="date_to_add" type="radio" value="date_to_add" name="sort_by" onclick="sortWords('date');"><label for="date_to_add">Дате добавления</label>
                 {% include 'up_down_scroll.html' %}
+                <br><br><br>
+
+                <div style="margin-left: 80%;">
+                    <input type="button" value="Выделить всё" onclick="checkedWords.forEach(item => item.checked = true);">
+                    <input type="button" value="Снять выделение" onclick="checkedWords.forEach(item => item.checked = false);">
+                </div>
             {% else %}
                 <a href="/dictionary/{{dictionary_lang_code}}/upload/"><img title="Загрузить словарь" src="{{url_for('static', filename='img/upload_icon.png')}}"></a>
             {% endif %}
-
-            <br><br><br>
-
-            <div style="margin-left: 80%;">
-                <input type="button" value="Выделить всё" onclick="checkedWords.forEach(item => item.checked = true);">
-                <input type="button" value="Снять выделение" onclick="checkedWords.forEach(item => item.checked = false);">
-            </div>
 
             <table id="words-table">
                 <script>
