@@ -54,16 +54,11 @@
         };
 
         function splitText(splitter, isChecked=true) {
+            splitter = isChecked ? splitter : '<br>';
+            var joiner = isChecked ? '<br>' : splitter;
 
-            if (isChecked) {
-                var splitterText = `{{note_content}}`.split(splitter).join('<br>');
-                noteContentTag.innerHTML = splitterText;
-            } else {
-                var splitterText = `{{note_content}}`.split('<br>').join(splitter);
-                noteContentTag.innerHTML = splitterText;
-            }
-
-
+            var splitterText = `{{note_content}}`.split(splitter).join(joiner);
+            noteContentTag.innerHTML = splitterText;
         }
     </script>
 </body>
