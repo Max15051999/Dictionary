@@ -38,6 +38,7 @@
         <h1>{{note_title}}</h1>
         <p id="note-content-tag" class="note-content">{{note_content}}</p>
         <br><br><br>
+        <button onclick="window.location.href = window.location.href.replace('show_note', 'change_note');">Изменить заметку</button><br>
         <a href="../../"><button>Назад</button></a>
     </div>
     <script src="{{url_for('static', filename='scripts/theme.js')}}"></script>
