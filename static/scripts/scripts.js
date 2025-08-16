@@ -396,11 +396,18 @@ function sortNotes(sortType = 'alphabet', notesList) {
     notesList.forEach((noteInfo, i) => {
         var noteId = noteInfo['id'];
         var noteTitle = noteInfo['title'];
+        var noteCard = noteCards[i];
 
-        noteTitles[i].innerHTML = noteTitle;
-        noteDates[i].innerHTML = getFormattedDateString(new Date(noteInfo['date_to_add'] * 1000));
-        noteDeleteImgs[i].setAttribute('onclick', `deleteNote(${noteId}, "${noteTitle}");`);
-        noteChangeLinks[i].href = `${window.location.href}change_note/${noteId}`;
+        noteCard.getElementsByClassName('note-title')[0].href = `${window.location.href}show_note/${noteId}`;
+        noteCard.getElementsByClassName('title')[0].innerHTML = noteTitle;
+        noteCard.getElementsByClassName('date-to-add')[0].innerHTML = getFormattedDateString(new Date(noteInfo['date_to_add'] * 1000));
+        noteCard.getElementsByClassName('note-delete')[0].setAttribute('onclick', `deleteNote(${noteId}, "${noteTitle}");`);
+        noteCard.getElementsByClassName('note-change')[0].href = `${window.location.href}change_note/${noteId}`;
+
+//        noteTitles[i].innerHTML = noteTitle;
+//        noteDates[i].innerHTML = getFormattedDateString(new Date(noteInfo['date_to_add'] * 1000));
+//        noteDeleteImgs[i].setAttribute('onclick', `deleteNote(${noteId}, "${noteTitle}");`);
+//        noteChangeLinks[i].href = `${window.location.href}change_note/${noteId}`;
     });
 }
 
