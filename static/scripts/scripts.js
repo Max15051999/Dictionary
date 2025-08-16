@@ -361,29 +361,36 @@ function sortWords(sortType = 'alphabet') {
 
     // console.log(wordDeleteImgs);
 
-    for (var i = 0; i < wordOriginals.length; i++) {
+    listWords.forEach((wordInfo, i) => {
         // Change onclick attribute to img tag
-        var wordInfo = listWords[i];
         var original = wordInfo.original;
         var translate = wordInfo.translate;
         var transcription = wordInfo.transcription;
         var lang = wordInfo.lang;
+        var wordCard = wordCards[i];
 
-        wordSayImgs[i].setAttribute('onclick', `sayWord("${original}", '${lang}');`)
-        wordOriginals[i].innerHTML = original;
-        wordOriginals[i].setAttribute('data-trans', translate);
-        wordTranscriptions[i].innerHTML = transcription;
+//        wordSayImgs[i].setAttribute('onclick', `sayWord("${original}", '${lang}');`)
+//        wordOriginals[i].innerHTML = original;
+//        wordOriginals[i].setAttribute('data-trans', translate);
+//        wordTranscriptions[i].innerHTML = transcription;
 
         var wordFormattedDate = getFormattedDateString(new Date(wordInfo.timestamp * 1000));
-        wordDates[i].innerHTML = wordFormattedDate;
+        // wordDates[i].innerHTML = wordFormattedDate;
 
         // wordDeleteImgs[i].removeAttribute('onclick');
-        wordDeleteImgs[i].setAttribute('onclick', `deleteWord(${wordInfo.id}, "${original}")`);
+        // wordDeleteImgs[i].setAttribute('onclick', `deleteWord(${wordInfo.id}, "${original}")`);
 
         // wordDeleteImgs[i].onclick = () => deleteWord(wordInfo.id, original);
         // wordDeleteImgs[i].title = 'HELL';
-        wordChangeLinks[i].href = `${window.location.href}change/${wordInfo.id}/${original}/${translate}/${transcription ? transcription : 'ES'}/`;
-    }
+        // wordChangeLinks[i].href = `${window.location.href}change/${wordInfo.id}/${original}/${translate}/${transcription ? transcription : 'ES'}/`;
+        wordCard.getElementsByClassName('word-say')[0].setAttribute('onclick', `sayWord("${original}", '${lang}');`);
+        wordCard.getElementsByClassName('word')[0].innerHTML = original;
+        wordCard.getElementsByClassName('word')[0].setAttribute('data-trans', translate);
+        wordCard.getElementsByClassName('transcription')[0].innerHTML = transcription;
+        wordCard.getElementsByClassName('date-to-add')[0].innerHTML = wordFormattedDate;
+        wordCard.getElementsByClassName('word-delete')[0].setAttribute('onclick', `deleteWord(${wordInfo.id}, "${original}")`);
+        wordCard.getElementsByClassName('word-change')[0].href = `${window.location.href}change/${wordInfo.id}/${original}/${translate}/${transcription ? transcription : 'ES'}/`;
+    });
 }
 
 function sortNotes(sortType = 'alphabet', notesList) {
