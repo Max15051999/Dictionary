@@ -85,7 +85,10 @@ function setForeignLang(event, showHideSpecSymFn, params) {
     firstLangLabel.innerHTML = foreignLang.value;
     firstLangLabel.setAttribute('data-code', langCode);
 
-    document.getElementById('second-lang').innerHTML = 'Русский';
+    var secondLang = document.getElementById('second-lang');
+
+    secondLang.innerHTML = 'Русский';
+    secondLang.setAttribute('data-code', 'RU');
 
     var wordhuntBtn = document.getElementById('wordhunt');
 
