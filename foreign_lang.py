@@ -5,6 +5,7 @@ from enum import Enum
 class ForeignLang(Enum):
 	EN = 'Английский'
 	DE = 'Немецкий'
+	IT = 'Итальянский'
 
 	@staticmethod
 	def get_lang_by_code(code: str, word_end=None) -> Union[str, None]:

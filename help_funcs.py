@@ -23,17 +23,24 @@ def get_translate_by_word(word: str, first_lang: str, is_part_word: bool, second
 	word = word.capitalize()
 	is_first_part = len(word) == 1
 
-	if first_lang == ForeignLang.EN.name:
-		query = queries.GET_TRANSLATE_AND_TRANSCRIPTION_BY_ENGLISH_WORD(is_part_word, is_first_part)
+	# if first_lang == ForeignLang.EN.name:
+	# 	query = queries.GET_TRANSLATE_AND_TRANSCRIPTION_BY_ENGLISH_WORD(is_part_word, is_first_part)
+	# 	params = [word, first_lang]
+	# elif first_lang == ForeignLang.DE.name:
+	# 	query = queries.GET_TRANSLATE_AND_TRANSCRIPTION_BY_DEUTSCH_WORD(is_part_word, is_first_part)
+	# 	params = [word, first_lang]
+	# elif first_lang == config.RU_LANG_ALIAS:
+	# 	query = queries.GET_TRANSLATE_AND_TRANSCRIPTION_BY_RUSSIAN_WORD(is_part_word, is_first_part)
+	# 	params = [word, second_lang]
+	# else:
+	# 	return None
+
+	if first_lang != config.RU_LANG_ALIAS:
+		query = queries.GET_TRANSLATE_AND_TRANSCRIPTION_BY_FOREIGN_WORD(is_part_word, is_first_part)
 		params = [word, first_lang]
-	elif first_lang == ForeignLang.DE.name:
-		query = queries.GET_TRANSLATE_AND_TRANSCRIPTION_BY_DEUTSCH_WORD(is_part_word, is_first_part)
-		params = [word, first_lang]
-	elif first_lang == config.RU_LANG_ALIAS:
+	else:
 		query = queries.GET_TRANSLATE_AND_TRANSCRIPTION_BY_RUSSIAN_WORD(is_part_word, is_first_part)
 		params = [word, second_lang]
-	else:
-		return None
 
 	translate = db.query_execute(query, params=tuple(params), is_fetch_one=not is_part_word, is_fetch_all=is_part_word)
 
@@ -43,7 +50,8 @@ def get_translate_by_word(word: str, first_lang: str, is_part_word: bool, second
 		# query = queries.GET_TRANSLATE_AND_TRANSCRIPTION_BY_ENGLISH_WORD(is_part_word, is_first_part) if foreign_lang == config.RU_LANG_ALIAS \
 		# 	else queries.GET_TRANSLATE_AND_TRANSCRIPTION_BY_RUSSIAN_WORD(is_part_word, is_first_part)
 
-		translate = db.query_execute(query, params=tuple(params), is_fetch_one=not is_part_word, is_fetch_all=is_part_word)
+		translate = db.query_execute(query, params=tuple(params), is_fetch_one=not is_part_word,
+									 is_fetch_all=is_part_word)
 
 	return translate
 
