@@ -32,10 +32,13 @@ DELETE_WORD_BY_ID = f""" DELETE FROM {config.WORDS_TABLE_NAME} WHERE id = ?; """
 
 DELETE_ALL_WORDS_BY_LANG = f""" DELETE FROM {config.WORDS_TABLE_NAME} WHERE lang = ?; """
 
-GET_TRANSLATE_AND_TRANSCRIPTION_BY_ENGLISH_WORD = lambda is_word_part, is_first_letter=False: f""" SELECT translate, transcription FROM 
-{config.WORDS_TABLE_NAME} WHERE original LIKE {'?' if not is_word_part else '? || "%"' if is_first_letter else '"%" || ? || "%"'} AND lang = ?; """
+# GET_TRANSLATE_AND_TRANSCRIPTION_BY_ENGLISH_WORD = lambda is_word_part, is_first_letter=False: f""" SELECT translate, transcription FROM
+# {config.WORDS_TABLE_NAME} WHERE original LIKE {'?' if not is_word_part else '? || "%"' if is_first_letter else '"%" || ? || "%"'} AND lang = ?; """
+#
+# GET_TRANSLATE_AND_TRANSCRIPTION_BY_DEUTSCH_WORD = lambda is_word_part, is_first_letter=False: f""" SELECT translate, transcription FROM
+# {config.WORDS_TABLE_NAME} WHERE original LIKE {'?' if not is_word_part else '? || "%"' if is_first_letter else '"%" || ? || "%"'} AND lang = ?; """
 
-GET_TRANSLATE_AND_TRANSCRIPTION_BY_DEUTSCH_WORD = lambda is_word_part, is_first_letter=False: f""" SELECT translate, transcription FROM 
+GET_TRANSLATE_AND_TRANSCRIPTION_BY_FOREIGN_WORD = lambda is_word_part, is_first_letter=False: f""" SELECT translate, transcription FROM 
 {config.WORDS_TABLE_NAME} WHERE original LIKE {'?' if not is_word_part else '? || "%"' if is_first_letter else '"%" || ? || "%"'} AND lang = ?; """
 
 GET_TRANSLATE_AND_TRANSCRIPTION_BY_RUSSIAN_WORD = lambda is_word_part, is_first_letter=False: f""" SELECT original, transcription FROM 
