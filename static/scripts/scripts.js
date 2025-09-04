@@ -230,13 +230,14 @@ function deleteNote(noteId, noteTitle = '', lang = '') {
     }
 }
 
-function sayWord(word, lang) {
+function sayWord(word, lang, rate=1) {
     try {
         // var lang = sessionStorage.getItem('source_lang').toLowerCase();
         // console.log(lang);
         var sp = new SpeechSynthesisUtterance();
         sp.lang = lang.toLowerCase();
         sp.text = word;
+        sp.rate = rate;
         speechSynthesis.speak(sp);
     } catch (e) {
         alert(`Не удалось произнести слово.\n${e}`);
@@ -513,10 +514,13 @@ function updateStorageListWords(sourceLang = '', takeFromEnd = false) {
     sessionStorage.setItem('take_from_end', takeFromEnd ? '1' : '0');
 }
 
-function startGame(foreignLang, is_forgotten=false) {
+function startGame(foreignLang, isForgotten=false, isDictation=false) {
     var lang = document.getElementById('EN_RU').checked ? foreignLang : 'RU';
 
-    if (is_forgotten) {
+    sessionStorage.isDictation = isDictation;
+    lang = isDictation ? foreignLang : lang;
+
+    if (isForgotten) {
 
         var forgottenWords = listWords.filter(wordInfo => wordInfo.is_forgotten == 1);
         var forgottenLen = forgottenWords.length;
@@ -557,7 +561,7 @@ function startGame(foreignLang, is_forgotten=false) {
         }
     }
 
-    var isChecked = document.getElementById('word-cards').checked;
+    var isChecked = isDictation ? false : document.getElementById('word-cards').checked;
 
     sessionStorage.setItem('word_cards', isChecked)
     sessionStorage.setItem('btn_word_cards_checked', isChecked)
@@ -617,7 +621,11 @@ function checkTranslateWord(checkBtn) {
         translateWordValue = translateWordValue.toLocaleLowerCase()
         translateWordValue = translateWordValue.replaceAll('ё', 'е');
         var sourceLang = sessionStorage.getItem('source_lang');
-        var answer = listWords[wordIndex - 1][sourceLang == 'RU' ? 'original' : 'translate'].trim();;
+
+        var currentWord = listWords[wordIndex - 1];
+
+        var answer = currentWord[sourceLang === 'RU' || isDictation ? 'original' : 'translate'].trim();
+
         var rightAnswerLabel = document.getElementById('right-answer');
 
         var isAnswerRight = false;
@@ -637,6 +645,9 @@ function checkTranslateWord(checkBtn) {
         }
 
         var imgUrl;
+
+        if (isDictation)
+            answer += ` (${currentWord['translate']})`;
 
         rightAnswerLabel.innerHTML = answer;
 
@@ -684,7 +695,7 @@ function checkTranslateWord(checkBtn) {
                 }
                 wordIndex++;
 
-                if (sayWordsAutomaticallyCheckbox.checked)
+                if (sayWordsAutomaticallyCheckbox.checked || isDictation)
                     sayWord(`${originalWord.innerHTML}`, sourceLang);
 
             } else {
