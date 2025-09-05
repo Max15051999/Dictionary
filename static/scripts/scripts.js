@@ -618,8 +618,11 @@ function checkTranslateWord(checkBtn) {
 
     if (translateWordValue != '') {
         // translateWordValue = translateWordValue.charAt(0).toUpperCase() + translateWordValue.toLowerCase().slice(1);
-        translateWordValue = translateWordValue.toLocaleLowerCase()
-        translateWordValue = translateWordValue.replaceAll('ё', 'е');
+
+        translateWordValue = translateWordValue.toLocaleLowerCase();
+        translateWordValue = translateWordValue.replaceAll('ё', 'е').replaceAll('ä', 'ae').replaceAll('ö', 'oe').replaceAll('ü', 'ue').replaceAll('ß', 'ss');
+
+
         var sourceLang = sessionStorage.getItem('source_lang');
 
         var currentWord = listWords[wordIndex - 1];
@@ -635,13 +638,13 @@ function checkTranslateWord(checkBtn) {
             // translateWordValue = translateWordValue.toLowerCase();
 
             for (var word of wordVariants) {
-                if (word.toLocaleLowerCase().trim().replaceAll('ё', 'е') === translateWordValue) {
+                if (word.toLocaleLowerCase().trim().replaceAll('ё', 'е').replaceAll('ä', 'ae').replaceAll('ö', 'oe').replaceAll('ü', 'ue').replaceAll('ß', 'ss') === translateWordValue) {
                     isAnswerRight = true;
                     break;
                 }
             }
         } else {
-            isAnswerRight = translateWordValue === answer.toLocaleLowerCase().replaceAll('ё', 'е');
+            isAnswerRight = translateWordValue === answer.toLocaleLowerCase().replaceAll('ё', 'е').replaceAll('ä', 'ae').replaceAll('ö', 'oe').replaceAll('ü', 'ue').replaceAll('ß', 'ss');
         }
 
         var imgUrl;
