@@ -619,8 +619,25 @@ function checkTranslateWord(checkBtn) {
     if (translateWordValue != '') {
         // translateWordValue = translateWordValue.charAt(0).toUpperCase() + translateWordValue.toLowerCase().slice(1);
 
+        function replaceSpecialSyms(string) {
+            var splSyms = {
+                'ё': 'е',
+                'ä': 'ae',
+                'ö': 'oe',
+                'ü': 'ue',
+                'ß': 'ss',
+            }
+
+            for (var [key, value] of Object.entries(splSyms))
+                string = string.replaceAll(key, value);
+
+            string = string.replaceAll(/[\u0000-\u001F\u007F-\u009F\u200B-\u200F\u2028-\u202F]/g, '');
+
+            return string;
+        }
+
         translateWordValue = translateWordValue.toLocaleLowerCase();
-        translateWordValue = translateWordValue.replaceAll('ё', 'е').replaceAll('ä', 'ae').replaceAll('ö', 'oe').replaceAll('ü', 'ue').replaceAll('ß', 'ss');
+        translateWordValue = replaceSpecialSyms(translateWordValue);
 
 
         var sourceLang = sessionStorage.getItem('source_lang');
@@ -638,13 +655,13 @@ function checkTranslateWord(checkBtn) {
             // translateWordValue = translateWordValue.toLowerCase();
 
             for (var word of wordVariants) {
-                if (word.toLocaleLowerCase().trim().replaceAll('ё', 'е').replaceAll('ä', 'ae').replaceAll('ö', 'oe').replaceAll('ü', 'ue').replaceAll('ß', 'ss') === translateWordValue) {
+                if (replaceSpecialSyms(word.toLocaleLowerCase().trim()) === translateWordValue) {
                     isAnswerRight = true;
                     break;
                 }
             }
         } else {
-            isAnswerRight = translateWordValue === answer.toLocaleLowerCase().replaceAll('ё', 'е').replaceAll('ä', 'ae').replaceAll('ö', 'oe').replaceAll('ü', 'ue').replaceAll('ß', 'ss');
+            isAnswerRight = translateWordValue === replaceSpecialSyms(answer.toLocaleLowerCase());
         }
 
         var imgUrl;
