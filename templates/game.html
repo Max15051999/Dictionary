@@ -184,7 +184,9 @@
             var isDictation = sessionStorage.getItem('isDictation') === 'true';
 
             if (isDictation) {
+                translateWordInput.style.marginTop = '5%';
                 originalWord.style.display = 'none';
+                transcriptionWord.style.display = 'none';
                 sayWordsAutomaticallyCheckbox.style.display = 'none';
                 document.querySelector('label[for="say_words_automatically_checkbox"]').style.display = 'none';
                 document.getElementById('voice-div').style.display = 'block';
