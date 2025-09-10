@@ -25,7 +25,7 @@
         <br><br>
       {% endif %}
 
-      <form action="." method="post">
+      <form action="." method="post" onsubmit="submit_btn.disabled = true; return true;">
           <input class="input" id="title-input" type="text" name="note-title" value="{{note_title}}" placeholder="Введите название..." required>
           <br><br><br>
           <textarea class="input" id="content-input" name="note-content" placeholder="Введите текст..." required rows="15">{{note_content}}</textarea>
@@ -33,7 +33,7 @@
           <button type="submit">{{title}}</button>
       </form>
       <br>
-      <a href="{{href_back}}"><button>Назад</button></a>
+      <a href="{{href_back}}" name="submit_btn"><button>Назад</button></a>
   </div>
   <script src="{{url_for('static', filename='scripts/theme.js')}}"></script>
   <script src="{{url_for('static', filename='scripts/scripts.js')}}"></script>

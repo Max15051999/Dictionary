@@ -23,7 +23,7 @@
             var specialSymbols = document.getElementById('special-symbols');
             showHideSpecialSymbolsBtn('{{lang}}', specialSymbolsBtn, specialSymbols);
         </script>
-        <form action="." method="post">
+        <form action="." method="post" onsubmit="submit_btn.disabled = true; return true;">
             <input type="number" value="{{word_id}}" hidden="hidden">
 
             <label class="label" for="original-input-word">Слово на
@@ -43,7 +43,7 @@
             <label class="label" for="transc">Транскрипция</label><br><br>
             <input class="input" id="transc" name="transcription" type="text" value="{{transcription if transcription != 'ES' else ''}}" placeholder="Введите транскрипцию...">
             <br><br><br><br><br>
-            <button type="submit">{{title}}</button>
+            <button type="submit" name="submit_btn">{{title}}</button>
         </form>
         <br>
         <a href="{{href_back}}"><button>Назад</button></a>
