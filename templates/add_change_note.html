@@ -11,7 +11,7 @@
   <div class="container">
       {% include 'theme.html' %}
       <h1>{{title}}</h1>
-      <hr><br><br><br>
+      <hr>
 
       {% if msg %}
           <script>
@@ -20,8 +20,14 @@
           </script>
       {% endif %}
 
-      {% if lang == 'DE' %}
-        <h1>СПЕЦ: ä  ö  ü  ß</h1>
+      {% if lang in ('DE', 'UK') %}
+        <h2>Копировать</h2>
+        {% include 'special_symbols.html' %}
+        <script>
+            var specialSymbolsBtn = document.getElementById('special-symbols-btn');
+            var specialSymbols = document.getElementById('special-symbols');
+            showHideSpecialSymbolsBtn('{{lang}}', specialSymbolsBtn, specialSymbols);
+        </script>
         <br><br>
       {% endif %}
 

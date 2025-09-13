@@ -6,6 +6,7 @@
     <link rel="stylesheet" href="{{url_for('static', filename='css/index.css')}}">
     <link rel="stylesheet" href="{{url_for('static', filename='css/game.css')}}">
     <script src="{{url_for('static', filename='scripts/scripts.js')}}"></script>
+    <script src="{{url_for('static', filename='scripts/special_symbols.js')}}"></script>
     <script>
         var sourceLang = sessionStorage.getItem('source_lang');
     </script>
@@ -20,8 +21,13 @@
 <!--        <label id="wrong_total">0</label><br><br>-->
         <img id="question-status" src="{{url_for('static', filename='img/thinking_icon.png')}}"/><br>
 
-        {% if lang_code == 'DE' %}
+        {% if lang_code in ('DE', 'UK') %}
             {% include 'special_symbols.html' %}
+            <script>
+                var specialSymbolsBtn = document.getElementById('special-symbols-btn');
+                var specialSymbols = document.getElementById('special-symbols');
+                showHideSpecialSymbolsBtn('{{lang_code}}', specialSymbolsBtn, specialSymbols);
+            </script>
         {% endif %}
 
         <label id="right-answer" style="color: green; font-size: 30px;"></label>
@@ -204,6 +210,5 @@
         </script>
     </div>
     <script src="{{url_for('static', filename='scripts/theme.js')}}"></script>
-    <script src="{{url_for('static', filename='scripts/special_symbols.js')}}"></script>
 </body>
 </html>

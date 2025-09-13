@@ -37,8 +37,13 @@
                 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                 <img id="saying-words-img" title="Произнести все слова по порядку" src="{{url_for('static', filename='img/start_saying_words.png')}}" onclick="startStopSayingAllWords();">
                 <br><br>
-                {% if dictionary_lang_code == 'DE' %}
+                {% if dictionary_lang_code in ('DE', 'UK') %}
                     {% include 'special_symbols.html' %}
+                    <script>
+                        var specialSymbolsBtn = document.getElementById('special-symbols-btn');
+                        var specialSymbols = document.getElementById('special-symbols');
+                        showHideSpecialSymbolsBtn('{{dictionary_lang_code}}', specialSymbolsBtn, specialSymbols);
+                    </script>
                     <br><br>
                 {% endif %}
                 <input id="original-input-word" type="text" placeholder="Введите слово...">

@@ -2,7 +2,17 @@
 
 function addSpecialSymbolInInput(elem) {
     var symbol = elem.textContent || elem.innerText;
-    document.getElementById('original-input-word').value += symbol;
+
+    try {
+        document.getElementById('original-input-word').value += symbol;
+    } catch (TypeError) {
+        navigator.clipboard.writeText(symbol).then(() => {
+          /* Resolved - text copied to clipboard successfully */
+        },() => {
+          alert(`Failed to copy ${symbol}`);
+          /* Rejected - text failed to copy to the clipboard */
+        });
+    }
 }
 
 function showHideSpecialSymbols() {
@@ -15,6 +25,17 @@ function showHideSpecialSymbols() {
 }
 
 function showHideSpecialSymbolsBtn(lang, specialSymbolsBtn, specialSymbols) {
-    specialSymbolsBtn.style.visibility = lang === 'DE' ? 'visible' : 'hidden';
-    specialSymbols.style.visibility = lang === 'DE' ? 'visible' : 'hidden';
+    var visible = 'hidden';
+
+    switch (lang) {
+        case 'DE':
+        case 'UK':
+            visible = 'visible';
+            for (var btn of specialSymbols.children)
+                btn.style.display = lang === btn.className ? 'block' : 'none';
+            break;
+    }
+
+    specialSymbolsBtn.style.visibility = visible;
+    specialSymbols.style.visibility = visible;
 }
