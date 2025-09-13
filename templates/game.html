@@ -9,6 +9,7 @@
     <script src="{{url_for('static', filename='scripts/special_symbols.js')}}"></script>
     <script>
         var sourceLang = sessionStorage.getItem('source_lang');
+        var wordCards = sessionStorage.getItem('word_cards');
     </script>
 </head>
 <body>
@@ -25,8 +26,13 @@
             {% include 'special_symbols.html' %}
             <script>
                 var specialSymbolsBtn = document.getElementById('special-symbols-btn');
-                var specialSymbols = document.getElementById('special-symbols');
-                showHideSpecialSymbolsBtn('{{lang_code}}', specialSymbolsBtn, specialSymbols);
+
+                if (wordCards === 'true') {
+                    specialSymbolsBtn.style.display = 'none';
+                } else {
+                    var specialSymbols = document.getElementById('special-symbols');
+                    showHideSpecialSymbolsBtn('{{lang_code}}', specialSymbolsBtn, specialSymbols);
+                }
             </script>
         {% endif %}
 
@@ -66,7 +72,6 @@
 
         <button onclick="checkBack();">Назад</button>
         <script>
-            var wordCards = sessionStorage.getItem('word_cards');
             var sayWordsAutomaticallyCheckbox = document.getElementById('say_words_automatically_checkbox');
 
             function setWordCardStyle(div, border, width, marginLeft) {
