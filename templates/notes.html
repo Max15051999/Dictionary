@@ -104,6 +104,26 @@
         // var noteDates = document.getElementsByClassName('date-to-add');
         // var noteDeleteImgs = document.getElementsByClassName('note-delete');
         // var noteChangeLinks = document.getElementsByClassName('note-change');
+
+        var noteKey = 'note_{{notes_lang_code}}';
+
+        if (!localStorage.getItem('notesScroll'))
+            localStorage.notesScroll = JSON.stringify({notes_scroll : {}});
+
+        var notesPositions = JSON.parse(localStorage.getItem('notesScroll')).notes_scroll;
+
+        window.addEventListener('beforeunload', function(e) {
+            var lastKnownScrollPosition = window.scrollY;
+
+            notesPositions[noteKey] = lastKnownScrollPosition;
+            localStorage.notesScroll = JSON.stringify({notes_scroll : notesPositions});
+        });
+
+        window.scrollTo({
+          top: notesPositions[noteKey],
+          left: 0,
+          behavior: 'smooth'
+        });
     </script>
     <script src="{{url_for('static', filename='scripts/theme.js')}}"></script>
     <script src="{{url_for('static', filename='scripts/scripts.js')}}"></script>

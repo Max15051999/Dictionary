@@ -72,9 +72,6 @@
                     var transcriptionDecoded = '';
                 </script>
                 {% for word in words %}
-                <script>
-
-                </script>
 
                 <tr>
                     <td>
@@ -133,6 +130,26 @@
         // var wordDates = document.getElementsByClassName('date-to-add');
         // var wordDeleteImgs = document.getElementsByClassName('word-delete');
         // var wordChangeLinks = document.getElementsByClassName('word-change');
+
+        var wordKey = 'word_{{dictionary_lang_code}}';
+
+        if (!localStorage.getItem('wordsScroll'))
+            localStorage.wordsScroll = JSON.stringify({words_scroll : {}});
+
+        var langsPositions = JSON.parse(localStorage.getItem('wordsScroll')).words_scroll;
+
+        window.addEventListener('beforeunload', function(e) {
+            var lastKnownScrollPosition = window.scrollY;
+
+            langsPositions[wordKey] = lastKnownScrollPosition;
+            localStorage.wordsScroll = JSON.stringify({words_scroll : langsPositions});
+        });
+
+        window.scrollTo({
+          top: langsPositions[wordKey],
+          left: 0,
+          behavior: 'smooth'
+        });
     </script>
     <script src="{{url_for('static', filename='scripts/theme.js')}}"></script>
 </body>
