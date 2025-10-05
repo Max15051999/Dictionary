@@ -246,15 +246,61 @@ function sayWord(word, lang, rate=1) {
 }
 
 function findWordCard() {
+    function hasMatch(string, pattern) {
+        return string.match(pattern);
+    }
+
     var wordPart = searchInput.value.trim();
 
-    if (wordPart != '') {
-        var url = window.location.href;
-        if (url.includes('search'))
-            window.location.href = `../../search/${wordPart}/`;
-        else
-            window.location.href = `search/${wordPart}/`;
+    var matchCards = new Set();
+
+    wordPart = wordPart.toLowerCase();
+
+    var i = 0;
+    for (var wordCard of wordCards) {
+        var wordTag = wordCard.getElementsByTagName('h2')[0];
+
+        var originWord = wordTag.innerHTML.toLowerCase();
+
+        var pattern = wordPart.length === 1 ? `^${wordPart}.*` : `.*${wordPart}.*`;
+
+        if (hasMatch(originWord, pattern))
+            matchCards.add(wordCard);
+
+        var transWord = wordTag.getAttribute('data-trans').toLowerCase();
+
+        if (hasMatch(transWord, pattern))
+            matchCards.add(wordCard);
+
+        wordCard.style.display = '';
+        checkedWords[i++].checked = false;
     }
+
+    var len = matchCards.size;
+
+    if (len === 0) {
+        len = wordCards.length;
+        alert('Совпадений не найдено!');
+
+    } else if (len === 1) {
+        len = wordCards.length;
+        matchCards.values().next().value.scrollIntoView({behavior: 'smooth'});
+
+    } else {
+        for (var wordCard of wordCards) {
+            wordCard.style.display = !matchCards.has(wordCard) ? 'none' : 'block';
+        }
+    }
+
+    searchInput.value = '';
+
+    var totalWords = document.getElementById('total-words');
+    totalWords.innerHTML = totalWords.innerHTML.replace(/\(.*\)/, `(${len})`)
+//        var url = window.location.href;
+//        if (url.includes('search'))
+//            window.location.href = `../../search/${wordPart}/`;
+//        else
+//            window.location.href = `search/${wordPart}/`;
 }
 
 function showHideListWords(btn) {
@@ -745,7 +791,7 @@ function startStopSayingAllWords() {
         var wordsForSpeaking = [];
 
         checkedWords.forEach((checkedWord, idx) => {
-            if (checkedWord.checked)
+            if (checkedWord.checked || checkedWord.parentNode.parentNode.style.display === 'block')
                 wordsForSpeaking.push(listWords[idx]);
         });
 
