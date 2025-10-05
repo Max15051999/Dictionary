@@ -830,11 +830,10 @@ function startStopSayingAllWords() {
 //    }
 }
 
+var utterance = new SpeechSynthesisUtterance();
+var utterance2 = new SpeechSynthesisUtterance();
 function speakWords(wordIndex, sayingWordsImg, words) {
     if (wordIndex < words.length) {
-        var utterance = new SpeechSynthesisUtterance();
-        var utterance2 = new SpeechSynthesisUtterance();
-
         var wordInfo = words[wordIndex];
 
         utterance.text = wordInfo.original;
