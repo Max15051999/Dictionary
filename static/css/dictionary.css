@@ -22,7 +22,6 @@ body {
     margin-left: auto;
     border: 5px solid green;
     border-radius: 20px;
-    display: inline-block;
 
     @media (max-width:768px) {
         width: 300px;

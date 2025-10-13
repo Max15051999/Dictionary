@@ -77,33 +77,41 @@
                 <tr>
                     <td>
                         <div class="main-card">
-                            <div class="word-card">
-                                <br>
-                                <img class="word-say" id="say_word_{{word.0}}" title="Произнести на {{dictionary_lang_code}}" src="{{url_for('static', filename='img/say_word_icon.png')}}">
-                                <h2 class="word" title="Клик для перевода" data-trans="{{word.2}}" onclick="swapWords(this);" oncontextmenu="copyTextToClipBoard(this.innerHTML);">{{word.1}}</h2>
-                                <h3 class="transcription">{{word.3 if word.3 else ''}}</h3>
-                                <label class="date-to-add">{{word.5}}</label><br><br>
-                                <img class="word-delete" title="Удалить" id="del_word_{{word.0}}" src="{{url_for('static', filename='img/delete_word_icon.png')}}"/>
-                                <a class="word-change" id="link_word_{{word.0}}"><img title="Изменить" src="{{url_for('static', filename='img/change_word_icon.png')}}"/></a>
-                                <script>
-                                    originalDecoded = parse('{{word.1}}');
-                                    translateDecoded = parse('{{word.2}}');
-                                    transcriptionDecoded = parse('{{word.3}}');
+                            <table>
+                                <tr>
+                                    <td>
+                                        <div class="word-card">
+                                            <br>
+                                            <img class="word-say" id="say_word_{{word.0}}" title="Произнести на {{dictionary_lang_code}}" src="{{url_for('static', filename='img/say_word_icon.png')}}">
+                                            <h2 class="word" title="Клик для перевода" data-trans="{{word.2}}" onclick="swapWords(this);" oncontextmenu="copyTextToClipBoard(this.innerHTML);">{{word.1}}</h2>
+                                            <h3 class="transcription">{{word.3 if word.3 else ''}}</h3>
+                                            <label class="date-to-add">{{word.5}}</label><br><br>
+                                            <img class="word-delete" title="Удалить" id="del_word_{{word.0}}" src="{{url_for('static', filename='img/delete_word_icon.png')}}"/>
+                                            <a class="word-change" id="link_word_{{word.0}}"><img title="Изменить" src="{{url_for('static', filename='img/change_word_icon.png')}}"/></a>
+                                            <script>
+                                                originalDecoded = parse('{{word.1}}');
+                                                translateDecoded = parse('{{word.2}}');
+                                                transcriptionDecoded = parse('{{word.3}}');
 
-                                    addWordsToList({{word.0}}, originalDecoded, translateDecoded, transcriptionDecoded, '{{dictionary_lang_code}}', '{{word.5}}');
+                                                addWordsToList({{word.0}}, originalDecoded, translateDecoded, transcriptionDecoded, '{{dictionary_lang_code}}', '{{word.5}}');
 
-                                    document.getElementById('link_word_{{word.0}}').href = `/dictionary/{{dictionary_lang_code}}/change/{{word.0}}/${originalDecoded}/${translateDecoded}/{{word.3 if word.3 else 'ES'}}/`;
+                                                document.getElementById('link_word_{{word.0}}').href = `/dictionary/{{dictionary_lang_code}}/change/{{word.0}}/${originalDecoded}/${translateDecoded}/{{word.3 if word.3 else 'ES'}}/`;
 
-                                    (function (_word) {
-                                        document.getElementById('say_word_{{word.0}}').onclick = () => sayWord(_word, '{{dictionary_lang_code}}');
-                                        document.getElementById('del_word_{{word.0}}').onclick = () => deleteWord({{word.0}}, _word, '{{dictionary_lang_code}}');
-                                    })(originalDecoded);
-                                </script>
-                            </div>
-                            <div style="display: inline-block; margin-left: 10%;">
-                                <input id="word-{{loop.index0}}" class="word-checker" type="checkbox">
-                                <label for="word-{{loop.index0}}">Выделить</label>
-                            </div>
+                                                (function (_word) {
+                                                    document.getElementById('say_word_{{word.0}}').onclick = () => sayWord(_word, '{{dictionary_lang_code}}');
+                                                    document.getElementById('del_word_{{word.0}}').onclick = () => deleteWord({{word.0}}, _word, '{{dictionary_lang_code}}');
+                                                })(originalDecoded);
+                                            </script>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div>
+                                            <input id="word-{{loop.index0}}" class="word-checker" type="checkbox">
+                                            <label for="word-{{loop.index0}}">Выделить</label>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </table>
                         </div>
                     </td>
                 </tr>

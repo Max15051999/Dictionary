@@ -836,8 +836,6 @@ function speakWords(wordIndex, sayingWordsImg, words) {
     if (wordIndex < words.length) {
         var wordInfo = words[wordIndex];
 
-        checkedWords[wordIndex].parentNode.parentNode.scrollIntoView({behavior: 'smooth'});
-
         utterance.text = wordInfo.original;
         utterance.lang = wordInfo.lang;
 
