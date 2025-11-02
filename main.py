@@ -107,10 +107,20 @@ def guess_words(lang_code: str):
   return render_template('guess_words.html', words=words_for_guess, lang_code=lang_code, lang_name=lang_name)
 
 
-@app.route('/guess_words/<lang_code>/game/', methods=['GET'])
+@app.route('/guess_words/<lang_code>/game/', methods=['GET', 'POST'])
 def game(lang_code: str):
   lang_name = ForeignLang.get_lang_by_code(lang_code)
   lang_name = lang_name[:-2] + 'ом' if lang_name.endswith('ий') else lang_name
+
+  if request.method == 'POST':
+    data: dict = json.loads(request.data.decode())
+    wrong_ids: List[int] = data['wrongIds']
+
+    if wrong_ids:
+      db = help_funcs.connect_to_db()
+      db.query_execute(queries.SET_ALL_WORDS_IS_FORGOTTEN_NO, params=(lang_code,))
+      db.query_execute(queries.SET_IS_FORGOTTEN_YES, params=[(wrong_id,) for wrong_id in wrong_ids], is_ext=True)
+
   return render_template('game.html', lang=lang_name, lang_code=lang_code)
 
 

@@ -641,7 +641,7 @@ function shuffle(listWords=null) {
     }
 }
 
-var wordIndex = 0;
+
 function setOriginalWord(lang) {
     listWords = JSON.parse(sessionStorage.getItem('words')).words;
     // console.log(listWords);
@@ -656,6 +656,9 @@ function setOriginalWord(lang) {
 
 //var rightAnswersCount = 0;
 //var wrongAnswersCount = 0;
+var wordIndex = 0;
+var gameHtmlPage = '';
+var gameScriptTagText = '';
 function checkTranslateWord(checkBtn) {
     listWords = JSON.parse(sessionStorage.getItem('words')).words;
     // var translateWordInput = document.getElementById('translate-input');
@@ -684,7 +687,6 @@ function checkTranslateWord(checkBtn) {
 
         translateWordValue = translateWordValue.toLocaleLowerCase();
         translateWordValue = replaceSpecialSyms(translateWordValue);
-
 
         var sourceLang = sessionStorage.getItem('source_lang');
 
@@ -767,12 +769,148 @@ function checkTranslateWord(checkBtn) {
             } else {
                 var rightAnswersCount = 0;
 
+                wordIndex = 0;
+
                 listWords.forEach(word => !word.is_wrong_answer ? ++rightAnswersCount : rightAnswersCount);
 
                 var wrongAnswersCount = listWords.length - rightAnswersCount;
 
-                window.location.href = `${window.location.href}statistic/${wordIndex}/${rightAnswersCount}/${wrongAnswersCount}/`
-                // sessionStorage.words = JSON.stringify({words: []});
+                var langName = document.getElementById('lang-name').innerHTML;
+
+                if (gameScriptTagText === '')
+                    gameScriptTagText = document.getElementById('main-script').textContent;
+
+                document.body.innerHTML = `
+                        <div class="container">
+                            <input id="white" type="radio" value="white" name="theme" onclick="changeTheme('white');">
+                            <label for="white">Светлая</label>
+                            <input id="black" type="radio" value="black" name="theme" onclick="changeTheme('black');" checked>
+                            <label for="black">Тёмная</label><br>
+                            <a style="color: red;" href="/">В начало</a>
+                            <h1>Статистика игры в слова на ${langName}</h1>
+                            <hr><br><br><br>
+
+                            <table id="statistic-table">
+                                <tr>
+                                    <td>Всего вопросов</td>
+                                    <td>${listWords.length}</td>
+                                </tr>
+                                <tr>
+                                    <td>Отвечено верно</td>
+                                    <td>${rightAnswersCount}</td>
+                                </tr>
+                                <tr>
+                                    <td id="wrong-ans">Отвечено неверно</td>
+                                    <td>${wrongAnswersCount}</td>
+                                </tr>
+                                <tr>
+                                    <td>Процент</td>
+                                    <td>${Math.round((rightAnswersCount * 100) / listWords.length)}%</td>
+                                </tr>
+                            </table>
+                            <hr><br><br><br>
+                            <button onclick="restartGame(true);" title="Нажмите <Enter>">Начать заново</button><br><br>
+
+                            <button id="updateForgotten" onclick="updateForgottenWords(this);">Добавить в забывающиеся</button><br><br>
+
+                            <button title="Нажмите Q" onclick="back();">Назад</button>
+                        </div>
+                `;
+
+                var statisticScriptTag = document.createElement('script');
+
+                // document.body.appendChild(tag);
+                statisticScriptTag.textContent = `
+                        var listWords = JSON.parse(sessionStorage.getItem('words')).words;
+
+                        function back() {
+                            window.location.href = '../';
+                        }
+
+                        function restartGame(withAllWords) {
+                            if (withAllWords) {
+                                var copyWords = JSON.parse(sessionStorage.getItem('copyWords')).copy_words;
+
+                                if (copyWords.length > 0)
+                                    listWords = copyWords;
+                            }
+
+                            if (sessionStorage.getItem('btn_word_cards_checked') == 'true')
+                                sessionStorage.setItem('word_cards', listWords.length >= 4);
+
+                            for (var i = listWords.length - 1; i >= 0; i--)
+                                listWords[i].is_wrong_answer = null;
+
+                            sessionStorage.words = JSON.stringify({words: listWords});
+
+                            // window.location.href = '../../../../';
+
+                            var tag = document.createElement('script');
+                            tag.setAttribute('id', 'main-script');
+
+                            tag.textContent = \`${gameScriptTagText}\`;
+
+                            document.body.innerHTML = \`${gameHtmlPage}\`;
+                            document.body.appendChild(tag);
+
+                        }
+
+                        function updateForgottenWords(btn) {
+                            var wrongIds = listWords.filter(wordInfo => wordInfo.is_wrong_answer).map(wordInfo => wordInfo.id);
+
+                            fetch('.', {
+                              method: 'POST',
+                              headers: {
+                                'Content-Type': 'application/json',
+                              },
+                              body: JSON.stringify({wrongIds: wrongIds})
+                            });
+
+                            alert('Неверно отвеченные слова обновлены');
+                            btn.disabled = true;
+                        }
+
+                        var wrongAnswers = document.getElementById('wrong-ans');
+
+                        if (${wrongAnswersCount} > 0) {
+                            // listWords = JSON.parse(sessionStorage.getItem('words')).words;
+
+                            wrongAnswers.style.color = 'Red';
+                            wrongAnswers.style.cursor = 'pointer';
+                            wrongAnswers.title = 'Повторить с этими словами';
+                            wrongAnswers.onclick = () => {
+                                if (JSON.parse(sessionStorage.getItem('copyWords')).copy_words.length == 0)
+                                    sessionStorage.copyWords = JSON.stringify({copy_words: listWords});
+
+                                listWords = listWords.filter(wordInfo => wordInfo.is_wrong_answer);
+
+                                restartGame(false);
+                                // sessionStorage.words = JSON.stringify({words: listWords});
+                                // window.location.href = '../../../../';
+                            }
+                        } else {
+                            wrongAnswers.style.color = 'Green';
+                            document.getElementById('updateForgotten').disabled = true;
+                        }
+
+                        document.body.addEventListener('keydown', (event) => {
+
+                            switch(event.code) {
+                                case 'Enter':
+                                    restartGame(true);
+                                    break;
+                                case 'KeyQ':
+                                    back();
+                                    break;
+                                default:
+                                    return;
+                            };
+
+                            }, {once: true});
+                `;
+
+                document.body.appendChild(statisticScriptTag);
+
             }
             checkBtn.disabled = false;
         }, 1000)
