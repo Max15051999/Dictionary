@@ -72,6 +72,7 @@
             <button id="check-answer" onclick="checkTranslateWord(this);">Готово</button>
         </div><br><br><br><br><br><br>
 
+        <button id="forgotten-action"></button>
         <button onclick="checkBack();">Назад</button>
         <script id="main-script">
             wordIndex = 0;
@@ -103,6 +104,7 @@
 
             var originalWord = document.getElementById('original-word');
             var transcriptionWord = document.getElementById('transcription-word');
+            var btnForgottenAction = document.getElementById('forgotten-action');
 
             if (sourceLang == 'RU')
                 transcriptionWord.hidden = true;
@@ -113,6 +115,8 @@
             setOriginalWord(sourceLang);
 
             var lenListWords = listWords.length;
+
+            changeForgottenWordsBtnState(wordIndex);
 
             if (wordCards === 'true') {
                 document.getElementsByClassName('word-choose-cards')[0].style.display = 'block';

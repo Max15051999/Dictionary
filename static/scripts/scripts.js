@@ -654,6 +654,16 @@ function setOriginalWord(lang) {
     transcriptionWord.innerHTML = wordInfo.transcription ? wordInfo.transcription : '';
 }
 
+function changeForgottenWordsBtnState(wordIndex) {
+    if (listWords[wordIndex].is_forgotten === 0) {
+        btnForgottenAction.innerHTML = 'Добавить в забывающиеся';
+        btnForgottenAction.onclick = () => updateForgotten(wordIndex, 1, this);
+    } else {
+        btnForgottenAction.innerHTML = 'Удалить из забывающихся';
+        btnForgottenAction.onclick = () => updateForgotten(wordIndex, 0, this);
+    }
+}
+
 //var rightAnswersCount = 0;
 //var wrongAnswersCount = 0;
 var wordIndex = 0;
@@ -761,6 +771,9 @@ function checkTranslateWord(checkBtn) {
                     }
                     wordCardIndex = -1;
                 }
+
+                changeForgottenWordsBtnState(wordIndex);
+
                 wordIndex++;
 
                 if (sayWordsAutomaticallyCheckbox.checked || isDictation)
@@ -811,8 +824,6 @@ function checkTranslateWord(checkBtn) {
                             <hr><br><br><br>
                             <button onclick="restartGame(true);" title="Нажмите <Enter>">Начать заново</button><br><br>
 
-                            <button id="updateForgotten" onclick="updateForgottenWords(this);">Добавить в забывающиеся</button><br><br>
-
                             <button title="Нажмите Q" onclick="back();">Назад</button>
                         </div>
                 `;
@@ -855,21 +866,6 @@ function checkTranslateWord(checkBtn) {
 
                         }
 
-                        function updateForgottenWords(btn) {
-                            var wrongIds = listWords.filter(wordInfo => wordInfo.is_wrong_answer).map(wordInfo => wordInfo.id);
-
-                            fetch('.', {
-                              method: 'POST',
-                              headers: {
-                                'Content-Type': 'application/json',
-                              },
-                              body: JSON.stringify({wrongIds: wrongIds})
-                            });
-
-                            alert('Неверно отвеченные слова обновлены');
-                            btn.disabled = true;
-                        }
-
                         var wrongAnswers = document.getElementById('wrong-ans');
 
                         if (${wrongAnswersCount} > 0) {
@@ -890,7 +886,6 @@ function checkTranslateWord(checkBtn) {
                             }
                         } else {
                             wrongAnswers.style.color = 'Green';
-                            document.getElementById('updateForgotten').disabled = true;
                         }
 
                         document.body.addEventListener('keydown', (event) => {
@@ -916,6 +911,42 @@ function checkTranslateWord(checkBtn) {
         }, 1000)
     } else {
         alert('Введите перевод слова');
+    }
+}
+
+function updateForgotten(wordIndex, actionType, actionBtn) {
+    if (navigator.onLine) {
+        var word = listWords[wordIndex];
+
+        word.is_forgotten = actionType;
+        sessionStorage.words = JSON.stringify({words: listWords});
+
+        fetch('.', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({wrongId: word.id, actionType: actionType})
+        });
+
+        if (actionType === 1) {
+
+            btnForgottenAction.innerHTML = 'Удалить из забывающихся';
+
+            alert(`Слово "${word.original}" добавлено в список забывающихся`);
+        } else {
+            btnForgottenAction.innerHTML = 'Добавить в забывающиеся';
+
+            alert(`Слово "${word.original}" удалено из списка забывающихся`);
+        }
+
+        changeForgottenWordsBtnState(wordIndex);
+
+    } else {
+        var msg = ' забывающихся нужен интернет';
+        msg = (actionType === 1 ? 'Для добавления данного слова в список' : 'Для удаления данного слова из списка') + msg;
+
+        alert(msg);
     }
 }
 

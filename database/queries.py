@@ -54,6 +54,6 @@ GET_WORDS_AMOUNT_BY_ORIGINAL_WORD = f""" SELECT COUNT(*) FROM {config.WORDS_TABL
 
 GET_WORDS_OF_CONCRETE_LANG_INFO_FOR_GUESS_GAME = f""" SELECT original, translate, transcription, lang, date_to_add, is_forgotten, id FROM {config.WORDS_TABLE_NAME} WHERE lang = ?; """
 
-SET_ALL_WORDS_IS_FORGOTTEN_NO = f""" UPDATE {config.WORDS_TABLE_NAME} SET is_forgotten = false WHERE lang = ?; """
+SET_IS_FORGOTTEN_NO = f""" UPDATE {config.WORDS_TABLE_NAME} SET is_forgotten = false WHERE id = ?; """
 
 SET_IS_FORGOTTEN_YES = f""" UPDATE {config.WORDS_TABLE_NAME} SET is_forgotten = true WHERE id = ?; """

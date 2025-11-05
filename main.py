@@ -114,12 +114,20 @@ def game(lang_code: str):
 
   if request.method == 'POST':
     data: dict = json.loads(request.data.decode())
-    wrong_ids: List[int] = data['wrongIds']
+    wrong_id: int = data['wrongId']
+    action_type: int = data['actionType']
 
-    if wrong_ids:
+    print(wrong_id, action_type)
+
+    if wrong_id:
       db = help_funcs.connect_to_db()
-      db.query_execute(queries.SET_ALL_WORDS_IS_FORGOTTEN_NO, params=(lang_code,))
-      db.query_execute(queries.SET_IS_FORGOTTEN_YES, params=[(wrong_id,) for wrong_id in wrong_ids], is_ext=True)
+
+      if action_type == 1:
+        query = queries.SET_IS_FORGOTTEN_YES
+      else:
+        query = queries.SET_IS_FORGOTTEN_NO
+
+      db.query_execute(query, params=(wrong_id,))
 
   return render_template('game.html', lang=lang_name, lang_code=lang_code)
 
@@ -146,7 +154,7 @@ def statistic(lang_code: str, total_words: str, right_answers_count: str, wrong_
     wrong_ids: List[int] = data['wrongIds']
 
     db = help_funcs.connect_to_db()
-    db.query_execute(queries.SET_ALL_WORDS_IS_FORGOTTEN_NO, params=(lang_code,))
+    db.query_execute(queries.SET_IS_FORGOTTEN_NO, params=(lang_code,))
     db.query_execute(queries.SET_IS_FORGOTTEN_YES, params=[(wrong_id,) for wrong_id in wrong_ids], is_ext=True)
 
   return render_template('statistic.html', total=total_words_num,
@@ -504,3 +512,4 @@ def upload_file(lang: str):
   remove(file_full_path)
 
   return render_template('dictionary.html', upload_new_words=True, lang=lang)
+
