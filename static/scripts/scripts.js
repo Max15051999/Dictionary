@@ -818,7 +818,7 @@ function checkTranslateWord(checkBtn) {
                                 </tr>
                                 <tr>
                                     <td>Процент</td>
-                                    <td>${Math.round((rightAnswersCount * 100) / listWords.length)}%</td>
+                                    <td>${((rightAnswersCount * 100) / listWords.length).toFixed(2)}%</td>
                                 </tr>
                             </table>
                             <hr><br><br><br>
@@ -948,6 +948,7 @@ function updateForgotten(wordIndex, actionType, actionBtn) {
 
         alert(msg);
     }
+
 }
 
 var isSaying = false;
