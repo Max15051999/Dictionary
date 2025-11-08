@@ -48,7 +48,7 @@
                     <br><br>
                 {% endif %}
                 <input id="original-input-word" type="text" placeholder="Введите слово...">
-                <img id="search-img" title="Поиск" src="{{url_for('static', filename='img/search_icon.png')}}" onclick="findWordCard();">
+                <img id="search-img" title="Поиск" src="{{url_for('static', filename='img/search_icon.png')}}" onclick="findWordCard(wordCards, true);">
                 <br><br>
                 <label>Сортировать по</label><br><br>
                 <input id="alphabet" type="radio" value="alphabet" name="sort_by" onclick="sortWords();"><label for="alphabet">алфавиту</label>
@@ -130,7 +130,7 @@
 
             searchInput.addEventListener('keydown', (event) => {
                 if (event.code == 'Enter')
-                    findWordCard();
+                    findWordCard(wordCards, true);
             });
         }
 

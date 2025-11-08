@@ -245,7 +245,7 @@ function sayWord(word, lang, rate=1) {
     // speechSynthesis.cancel();
 }
 
-function findWordCard() {
+function findWordCard(cards, isWord) {
     function hasMatch(string, pattern) {
         return string.match(pattern);
     }
@@ -257,44 +257,48 @@ function findWordCard() {
     wordPart = wordPart.toLowerCase();
 
     var i = 0;
-    for (var wordCard of wordCards) {
-        var wordTag = wordCard.getElementsByTagName('h2')[0];
+    for (var card of cards) {
+        var wordTag = card.getElementsByTagName('h2')[0];
 
         var originWord = wordTag.innerHTML.toLowerCase();
 
         var pattern = wordPart.length === 1 ? `^${wordPart}.*` : `.*${wordPart}.*`;
 
         if (hasMatch(originWord, pattern))
-            matchCards.add(wordCard);
+            matchCards.add(card);
 
-        var transWord = wordTag.getAttribute('data-trans').toLowerCase();
+        if (isWord) {
+            var transWord = wordTag.getAttribute('data-trans').toLowerCase();
 
-        if (hasMatch(transWord, pattern))
-            matchCards.add(wordCard);
+            if (hasMatch(transWord, pattern))
+                matchCards.add(card);
+        }
 
-        wordCard.style.display = '';
-        checkedWords[i++].checked = false;
+        card.style.display = '';
+
+
+        (isWord ? checkedWords : checkedNotes)[i++].checked = false;
     }
 
     var len = matchCards.size;
 
     if (len === 0) {
-        len = wordCards.length;
+        len = cards.length;
         alert('Совпадений не найдено!');
 
     } else if (len === 1) {
-        len = wordCards.length;
+        len = cards.length;
         matchCards.values().next().value.scrollIntoView({behavior: 'smooth'});
 
     } else {
-        for (var wordCard of wordCards) {
-            wordCard.style.display = !matchCards.has(wordCard) ? 'none' : 'block';
+        for (var card of cards) {
+            card.style.display = !matchCards.has(card) ? 'none' : 'block';
         }
     }
 
     searchInput.value = '';
 
-    var totalWords = document.getElementById('total-words');
+    var totalWords = document.getElementById(isWord ? 'total-words' : 'total-notes');
     totalWords.innerHTML = totalWords.innerHTML.replace(/\(.*\)/, `(${len})`)
 //        var url = window.location.href;
 //        if (url.includes('search'))
