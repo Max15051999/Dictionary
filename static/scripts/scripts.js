@@ -850,10 +850,14 @@ function checkTranslateWord(checkBtn) {
                                     listWords = copyWords;
                             }
 
-                            if (sessionStorage.getItem('btn_word_cards_checked') == 'true')
-                                sessionStorage.setItem('word_cards', listWords.length >= 4);
+                            var len = listWords.length;
 
-                            for (var i = listWords.length - 1; i >= 0; i--)
+                            if (sessionStorage.getItem('btn_word_cards_checked') === 'true') {
+                                sessionStorage.setItem('word_cards', len >= 4);
+                                wordCards = len >= 4 && !isDictation ? 'true' : 'false';
+                            }
+
+                            for (var i = len - 1; i >= 0; i--)
                                 listWords[i].is_wrong_answer = null;
 
                             sessionStorage.words = JSON.stringify({words: listWords});
@@ -866,6 +870,7 @@ function checkTranslateWord(checkBtn) {
                             tag.textContent = \`${gameScriptTagText}\`;
 
                             document.body.innerHTML = \`${gameHtmlPage}\`;
+
                             document.body.appendChild(tag);
 
                         }
