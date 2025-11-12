@@ -786,6 +786,9 @@ function checkTranslateWord(checkBtn) {
             } else {
                 var rightAnswersCount = 0;
 
+                var cloneBody = document.body.cloneNode(true);
+                document.body.parentNode.replaceChild(cloneBody, document.body);
+
                 wordIndex = 0;
 
                 listWords.forEach(word => !word.is_wrong_answer ? ++rightAnswersCount : rightAnswersCount);
@@ -806,6 +809,13 @@ function checkTranslateWord(checkBtn) {
                             <a style="color: red;" href="/">В начало</a>
                             <h1>Статистика игры в слова на ${langName}</h1>
                             <hr><br><br><br>
+
+                            <input type="radio" id="EN_RU" name="from_to" onclick="sessionStorage.setItem('source_lang', '${langCode}');" checked>
+                            <label id="original-lang-label" for="EN_RU">С ${langName.endsWith('ом') ? langName.slice(0, langName.length - 2) + 'ого' : langName} на Русский</label>
+                            <br><br>
+                            <input type="radio" id="RU_EN" name="from_to" onclick="sessionStorage.setItem('source_lang', 'RU');">
+                            <label id="second-lang-label" for="RU_EN">С Русского на ${langName.endsWith('ом') ? langName.slice(0, langName.length - 2) + 'ий' : langName}</label>
+                            <br><br><br>
 
                             <table id="statistic-table">
                                 <tr>
@@ -836,6 +846,9 @@ function checkTranslateWord(checkBtn) {
 
                 // document.body.appendChild(tag);
                 statisticScriptTag.textContent = `
+                        if (sourceLang === 'RU')
+                            document.getElementById('RU_EN').checked = true;
+
                         var listWords = JSON.parse(sessionStorage.getItem('words')).words;
 
                         function back() {
@@ -897,8 +910,8 @@ function checkTranslateWord(checkBtn) {
                             wrongAnswers.style.color = 'Green';
                         }
 
-                        document.body.addEventListener('keydown', (event) => {
-
+                        document.body.addEventListener('keydown', function setStatActions(event) {
+                            console.log('KEYDOWN')
                             switch(event.code) {
                                 case 'Enter':
                                     restartGame(true);

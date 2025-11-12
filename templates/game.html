@@ -10,8 +10,8 @@
     <script src="{{url_for('static', filename='scripts/scripts.js')}}"></script>
     <script src="{{url_for('static', filename='scripts/special_symbols.js')}}"></script>
     <script>
-        var sourceLang = sessionStorage.getItem('source_lang');
         var wordCards = sessionStorage.getItem('word_cards');
+        var langCode = '{{lang_code}}';;
     </script>
 </head>
 <body>
@@ -75,7 +75,12 @@
         <button id="forgotten-action"></button>
         <button onclick="checkBack();">Назад</button>
         <script id="main-script">
+            var cloneBody = document.body.cloneNode(true);
+            document.body.parentNode.replaceChild(cloneBody, document.body);
+
             wordIndex = 0;
+
+            var sourceLang = sessionStorage.getItem('source_lang');
 
             var sayWordsAutomaticallyCheckbox = document.getElementById('say_words_automatically_checkbox');
 
