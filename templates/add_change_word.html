@@ -35,6 +35,20 @@
                 </select>*</label><img class="word-say" title="Произнести"
                          onclick="sayWord(document.getElementById('original-input-word').value, document.getElementById('langs-selector').value);"
                          src="{{url_for('static', filename='img/say_word_icon.png')}}">
+
+                <select id="groups-selector" name="group" onclick="addGroupToSelector(this);">
+                    <option value="add">Добавить группу</option>
+                    <option value="empty">Без группы</option>
+                    {% if groups|length > 0 %}
+                        {% for group in groups %}
+                            {% if current_group == group.0 %}
+                                <option selected>{{group.0}}</option>
+                            {% else %}
+                                <option>{{group.0}}</option>
+                            {% endif %}
+                        {% endfor %}
+                    {% endif %}
+                </select>
             <br><br>
             <input class="input" id="original-input-word" name="original_word" type="text" value="{{word_en}}" placeholder="Введите слово..." required>
             <br><br><br>
