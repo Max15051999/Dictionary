@@ -38,7 +38,7 @@
 
                 <select id="groups-selector" name="group" onclick="addGroupToSelector(this);">
                     <option value="add">Добавить группу</option>
-                    <option value="empty">Без группы</option>
+                    <option value="empty" selected>Без группы</option>
                     {% if groups|length > 0 %}
                         {% for group in groups %}
                             {% if current_group == group.0 %}
