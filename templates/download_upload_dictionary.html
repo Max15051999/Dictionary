@@ -37,7 +37,18 @@
                 </script>
             {% endif %}
             {% include 'delimiters.html' %}
-            <h2>Количество слов {{words|length}}</h2>
+            <table align="center">
+                <tr>
+                    <td>
+                        <h2 id="total-words">Количество слов {{words|length}}</h2>
+                    </td>
+                    <td>
+                        <select id="groups-selector" onchange="showWordsByGroup(this.value, 'save');">
+                            <option value="all">Все группы</option>
+                        </select>
+                    </td>
+                </tr>
+            </table>
             <input id="all" type="radio" value="all_words" name="word_amount" checked
                    onclick="showHideWords('none');">
             <label for="all">Все слова</label>
@@ -49,17 +60,52 @@
                     onclick="selectWordsForSaveInFile(document.querySelector('#amount-words').value);">Выбрать</button>
             <br><br>
             <table id="words-table" align="center" style="display: none">
-                {% for word in words %}
+                <script>
+                    var parser = new DOMParser();
+                    var parse = (word) => parser.parseFromString(word, 'text/html').body.innerHTML;
+                    var originalDecoded = '';
+                    var translateDecoded = '';
+                    var transcriptionDecoded = '';
+                    var groupsSelector = document.getElementById('groups-selector');
+                    var uniqueGroups = new Set();
+                </script>
                 <tr>
-                    <script>
-                        listOfWords.push(`{{word.0}},{{word.1}}`);
-                        listOfSelectedWords.push(`{{word.0}},{{word.1}}`);
-                    </script>
-                    <td><input id="words-ckbox_{{loop.index0}}" class="words-checkbox" type="checkbox" checked
-                               onclick="incrementDecrementSelectedWordsAmount(this.checked, '{{word.0}}', '{{word.1}}');"></td>
-                    <td><label for="words-ckbox_{{loop.index0}}">{{word.0}}</label></td>
-                    <td><label for="words-ckbox_{{loop.index0}}">{{word.1}}</label></td>
+                    <td></td>
+                    <td>Original</td>
+                    <td>Translation</td>
+                    <td>Transcription</td>
+                    <td>Group</td>
                 </tr>
+                {% for word in words %}
+                    <tr>
+                        <script>
+                            originalDecoded = parse('{{word.0}}');
+                            translateDecoded = parse('{{word.1}}');
+                            transcriptionDecoded = parse('{{word.2}}');
+
+                            console.log('{{word.2}}');
+
+                            if ('{{word.7}}'.length > 0 && !uniqueGroups.has('{{word.7}}')) {
+                                var option = document.createElement('option');
+                                option.innerHTML = '{{word.7}}';
+                                groupsSelector.appendChild(option);
+                                uniqueGroups.add('{{word.7}}');
+                            }
+
+                            // listOfWords.push(`${originalDecoded},${translateDecoded}`);
+                            listOfSelectedWords[`${originalDecoded},${translateDecoded},${transcriptionDecoded},{{word.7}}`] = true;
+                        </script>
+                        <td><input id="words-ckbox_{{loop.index0}}" class="words-checkbox" type="checkbox" checked></td>
+                        <td><label for="words-ckbox_{{loop.index0}}">{{word.0}}</label></td>
+                        <td><label for="words-ckbox_{{loop.index0}}">{{word.1}}</label></td>
+                        <td><label for="words-ckbox_{{loop.index0}}">{{word.2}}</label></td>
+                        <td><label for="words-ckbox_{{loop.index0}}">{{word.7}}</label></td>
+                    </tr>
+                    <script>
+                        (function(rowPattern) {
+                            document.getElementById('words-ckbox_{{loop.index0}}').onclick = function() {incrementDecrementSelectedWordsAmount(this, rowPattern)};
+                        })(`${originalDecoded},${translateDecoded},${transcriptionDecoded},{{word.7}}`);
+                    </script>
                 {% endfor %}
             </table>
             <br><br><br><br>
@@ -83,5 +129,8 @@
         <a href=".." title="Нажмите"><button>Назад</button></a>
     </div>
     <script src="{{url_for('static', filename='scripts/theme.js')}}"></script>
+    <script>
+        console.log(listOfSelectedWords);
+    </script>
 </body>
 </html>

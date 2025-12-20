@@ -21,7 +21,7 @@ NOTES_TABLE_NAME = 'notes'
 RESPONSE_OK_STATUS_CODE = 200
 
 PATH_TO_DB = 'database/test.db'
-TABLE_NAME = 'words'
+
 TABLE_FIELDS = {
 	'id' : 'integer primary key autoincrement',
     'original' : 'text',
@@ -29,7 +29,8 @@ TABLE_FIELDS = {
 	'transcription' : 'varchar(50)',
 	'lang' : 'varchar(2)',
 	'date_to_add' : 'datetime default current_timestamp',
-	'is_forgotten' : 'integer default false'
+	'is_forgotten' : 'integer default false',
+	'_group' : 'text'
   }
 
 RU_LANG_ALIAS = 'RU'

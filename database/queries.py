@@ -24,9 +24,11 @@ GET_NOTE_FULL_INFO_BY_TITLE = lambda is_first_letter=False: f""" SELECT * FROM {
 
 SELECT_ALL_WORDS_BY_LANG = f""" SELECT * FROM {config.WORDS_TABLE_NAME} WHERE lang = ?; """
 
-INSERT_NEW_WORD = f""" INSERT INTO {config.WORDS_TABLE_NAME}(original, translate, transcription, lang, date_to_add) VALUES(?, ?, ?, ?, ?); """
+SELECT_ALL_GROUPS = f""" SELECT DISTINCT(_group) FROM {config.WORDS_TABLE_NAME} WHERE _group IS NOT NULL AND _group != ''; """
 
-UPDATE_WORD_BY_ID = f""" UPDATE {config.WORDS_TABLE_NAME} SET original=?, translate=?, transcription=?, lang = ? WHERE id = ?; """
+INSERT_NEW_WORD = f""" INSERT INTO {config.WORDS_TABLE_NAME}(original, translate, transcription, _group, lang, date_to_add) VALUES(?, ?, ?, ?, ?, ?); """
+
+UPDATE_WORD_BY_ID = f""" UPDATE {config.WORDS_TABLE_NAME} SET original=?, translate=?, transcription=?, _group = ?, lang = ? WHERE id = ?; """
 
 DELETE_WORD_BY_ID = f""" DELETE FROM {config.WORDS_TABLE_NAME} WHERE id = ?; """
 
@@ -52,7 +54,7 @@ GET_WORDS_AMOUNT_BY_ORIGINAL_WORD = f""" SELECT COUNT(*) FROM {config.WORDS_TABL
 
 # GET_ALL_WORDS_INFO_FOR_GUESS_GAME = f'SELECT original, translate, transcription, lang, date_to_add FROM {config.TABLE_NAME};'
 
-GET_WORDS_OF_CONCRETE_LANG_INFO_FOR_GUESS_GAME = f""" SELECT original, translate, transcription, lang, date_to_add, is_forgotten, id FROM {config.WORDS_TABLE_NAME} WHERE lang = ?; """
+GET_WORDS_OF_CONCRETE_LANG_INFO_FOR_GUESS_GAME = f""" SELECT original, translate, transcription, lang, date_to_add, is_forgotten, id, _group FROM {config.WORDS_TABLE_NAME} WHERE lang = ?; """
 
 SET_IS_FORGOTTEN_NO = f""" UPDATE {config.WORDS_TABLE_NAME} SET is_forgotten = false WHERE id = ?; """
 

@@ -25,7 +25,18 @@
     {% else %}
         <div class="container">
             {% include 'theme.html' %}
-            <h1 id="total-words">{{ 'Найдено' if is_search else dictionary_lang_name + ' словарь' }} ({{words|length}})</h1>
+            <table align="center">
+                <tr>
+                    <td>
+                        <h1 id="total-words">{{ 'Найдено' if is_search else dictionary_lang_name + ' словарь' }} ({{words|length}})</h1>
+                    </td>
+                    <td>
+                        <select id="groups-selector" onchange="showWordsByGroup(this.value, 'dict');">
+                            <option value="all">Все группы</option>
+                        </select>
+                    </td>
+                </tr>
+            </table>
 
             {% if words|length > 0 %}
                 <a href="/dictionaries/"><img title="К выбору словаря" src="{{url_for('static', filename='img/back_icon.png')}}"></a>
@@ -93,9 +104,9 @@
                                                 translateDecoded = parse('{{word.2}}');
                                                 transcriptionDecoded = parse('{{word.3}}');
 
-                                                addWordsToList({{word.0}}, originalDecoded, translateDecoded, transcriptionDecoded, '{{dictionary_lang_code}}', '{{word.5}}');
+                                                addWordsToList({{word.0}}, originalDecoded, translateDecoded, transcriptionDecoded, '{{word.7}}', '{{dictionary_lang_code}}', '{{word.5}}');
 
-                                                document.getElementById('link_word_{{word.0}}').href = `/dictionary/{{dictionary_lang_code}}/change/{{word.0}}/${originalDecoded}/${translateDecoded}/{{word.3 if word.3 else 'ES'}}/`;
+                                                document.getElementById('link_word_{{word.0}}').href = `/dictionary/{{dictionary_lang_code}}/change/{{word.0}}/${originalDecoded}/${translateDecoded}/{{word.7 if word.7 else 'ES'}}/{{word.3 if word.3 else 'ES'}}/`;
 
                                                 (function (_word) {
                                                     document.getElementById('say_word_{{word.0}}').onclick = () => sayWord(_word, '{{dictionary_lang_code}}');
@@ -122,6 +133,20 @@
         </div>
     {% endif %}
     <script>
+        var groupsSelector = document.getElementById('groups-selector');
+
+        var uniqueGroups = new Set();
+        listWords.forEach((elem, idx) => {
+            if (elem.group !== '')
+                uniqueGroups.add(elem.group);
+        });
+
+        for (var uniqueGroup of uniqueGroups) {
+            var option = document.createElement('option');
+            option.innerHTML = uniqueGroup;
+            groupsSelector.appendChild(option);
+        }
+
         var searchInput = document.getElementById('original-input-word');
         var checkedWords = document.querySelectorAll('.word-checker');
 

@@ -1,7 +1,6 @@
 import config
 import json
 from database import database, queries
-from foreign_lang import ForeignLang
 from typing import Union, Tuple, List
 from datetime import datetime
 
@@ -50,8 +49,7 @@ def get_translate_by_word(word: str, first_lang: str, is_part_word: bool, second
 		# query = queries.GET_TRANSLATE_AND_TRANSCRIPTION_BY_ENGLISH_WORD(is_part_word, is_first_part) if foreign_lang == config.RU_LANG_ALIAS \
 		# 	else queries.GET_TRANSLATE_AND_TRANSCRIPTION_BY_RUSSIAN_WORD(is_part_word, is_first_part)
 
-		translate = db.query_execute(query, params=tuple(params), is_fetch_one=not is_part_word,
-									 is_fetch_all=is_part_word)
+		translate = db.query_execute(query, params=tuple(params), is_fetch_one=not is_part_word, is_fetch_all=is_part_word)
 
 	return translate
 
@@ -69,14 +67,18 @@ def check_if_word_in_db(original_word: str, lang: str) -> bool:
 			return True
 	return False
 
-def add_word_in_db(original_word: str, word_ru: str, transcription: str, lang: str):
+def add_word_in_db(original_word: str, word_ru: str, transcription: str, group: str, lang: str):
 	original_word = original_word.replace("'", 'z*z').title().replace('z*Z', "'")
 	word_ru = word_ru.capitalize()
 	transcription = transcription.capitalize()
 	current_date = datetime.now().strftime(config.CURRENT_DATE_PATTERN)
 
-	db = connect_to_db()
-	db.query_execute(queries.INSERT_NEW_WORD, params=(original_word, word_ru, transcription, lang, current_date))
+	if group in ('add', 'empty'):
+		group = ''
+
+	if original_word:
+		db = connect_to_db()
+		db.query_execute(queries.INSERT_NEW_WORD, params=(original_word, word_ru, transcription, group, lang, current_date))
 
 
 def add_note_in_db(note_title: str, note_content: str, lang: str):
@@ -126,18 +128,22 @@ def search_notes(word_part: str, lang: str) -> List[Tuple[int, str, str, str, in
 
 	return  find_notes
 
-def prepare_words_and_check(req) -> Tuple[bool, str, str, str, str]:
-	data = req.form
+def prepare_words_and_check(req) -> Tuple[bool, str, str, str, str, str]:
+	data: dict = req.form
 	original_word = data.get('original_word')
 	word_ru = data.get('word_ru')
 	transcription = data.get('transcription')
 	lang = data.get('lang')
+	group = data.get('group')
 	is_err = False
 
 	if not original_word:
 		is_err = True
 	if not word_ru:
 		is_err = True
+
+	if group in ('add', 'empty'):
+		group = ''
 
 	if not is_err:
 		original_word = original_word.strip()
@@ -146,7 +152,7 @@ def prepare_words_and_check(req) -> Tuple[bool, str, str, str, str]:
 		if transcription:
 			transcription = transcription.strip()
 
-	return is_err, original_word, word_ru, transcription, lang
+	return is_err, original_word, word_ru, transcription, group, lang
 
 
 def get_words_from_concrete_dictionary(lang: str) -> List[Tuple[str, str, str, str]]:
@@ -161,8 +167,25 @@ def read_words_from_file_and_add_to_dict(file_path: str, lang: str, delimiter: s
 			# 	continue
 
 			items = line.split(delimiter)
-			original_word = items[0].strip()
-			translate_word = ','.join(items[1:]).strip()
-			transcription = ''
 
-			add_word_in_db(original_word, translate_word, transcription, lang)
+			try:
+				original_word = items[0].strip()
+			except IndexError:
+				original_word = ''
+
+			try:
+				translate_word = items[1].strip()
+			except IndexError:
+				translate_word = ''
+
+			try:
+				transcription = items[2].strip()
+			except IndexError:
+				transcription = ''
+
+			try:
+				group = items[3].strip()
+			except IndexError:
+				group = ''
+
+			add_word_in_db(original_word, translate_word, transcription, group, lang)

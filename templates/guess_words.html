@@ -17,7 +17,18 @@
     {% else %}
         <div class="container">
             {% include 'theme.html' %}
-            <h1>Угадай слова на {{lang_name[:-2] + 'ом' if lang_name.endswith('ий') else lang_name}}</h1>
+            <table align="center">
+                <tr>
+                    <td>
+                        <h1>Угадай слова на {{lang_name[:-2] + 'ом' if lang_name.endswith('ий') else lang_name}}</h1>
+                    </td>
+                    <td>
+                        <select id="groups-selector" onchange="showWordsByGroup(this.value, 'game');">
+                            <option value="all">Все группы</option>
+                        </select>
+                    </td>
+                </tr>
+            </table>
             <hr><br><br><br>
             <label id="total-dict-words"></label>
             <button id="show-hide" onclick="showHideListWords(this);">SHOW</button><br><br>
@@ -62,7 +73,7 @@
                         <label style="font-size: 40px" data-trans="{{word.1}}">{{word.0}}</label><br><br>
                     </div><br>
                     <script>
-                        addWordsToList(-1, parse('{{word.0}}'), parse('{{word.1}}'), parse('{{word.2}}'), '{{word.3}}', '{{word.4}}', {{word.5}}, {{word.6}});
+                        addWordsToList(-1, parse('{{word.0}}'), parse('{{word.1}}'), parse('{{word.2}}'), '{{word.7}}', '{{word.3}}', '{{word.4}}', {{word.5}}, {{word.6}});
                     </script>
                 {% endfor %}
                 <script>
@@ -78,6 +89,20 @@
     {% endif %}
     <script src="{{url_for('static', filename='scripts/theme.js')}}"></script>
     <script>
+        var groupsSelector = document.getElementById('groups-selector');
+
+        var uniqueGroups = new Set();
+        listWords.forEach((elem, idx) => {
+            if (elem.group !== '')
+                uniqueGroups.add(elem.group);
+        });
+
+        for (var uniqueGroup of uniqueGroups) {
+            var option = document.createElement('option');
+            option.innerHTML = uniqueGroup;
+            groupsSelector.appendChild(option);
+        }
+
         sessionStorage.copyWords = JSON.stringify({copy_words: []});
         // setTotalWordsInDict(document.getElementById('dict_choose'));
     </script>

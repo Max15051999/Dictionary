@@ -54,9 +54,10 @@ function addWordInDatabase() {
     var translatedWord = document.getElementById('read-translate').value.trim();
     var firstLang = document.getElementById('first-lang').getAttribute('data-code');
     var secondLang = document.getElementById('second-lang').getAttribute('data-code');
+    var group = document.getElementById('groups-selector').value;
 
     if (inputWord != '' && translatedWord != '')
-        window.location.href = `/add_new_word/${inputWord}/${translatedWord}/${firstLang}/${secondLang}/`
+        window.location.href = `/add_new_word/${inputWord}/${translatedWord}/${group}/${firstLang}/${secondLang}/`
     else
         alert('Для добавления в словарь нужны оба слова')
 }
@@ -163,8 +164,6 @@ function deleteWord(wordId, wordEn = '', lang = '') {
         selectedWordIds.push([wordId]);
     }
 
-    // console.log(lang)
-
     if (confirm(msg)) {
         lang = lang == '' ? 'default' : lang;
 
@@ -211,8 +210,6 @@ function deleteNote(noteId, noteTitle = '', lang = '') {
         selectedNoteIds.push([noteId]);
     }
 
-    // console.log(lang)
-
     if (confirm(msg)) {
         lang = lang == '' ? 'default' : lang;
 
@@ -232,8 +229,6 @@ function deleteNote(noteId, noteTitle = '', lang = '') {
 
 function sayWord(word, lang, rate=1) {
     try {
-        // var lang = sessionStorage.getItem('source_lang').toLowerCase();
-        // console.log(lang);
         var sp = new SpeechSynthesisUtterance();
         sp.lang = lang.toLowerCase();
         sp.text = word;
@@ -320,9 +315,102 @@ function showHideListWords(btn) {
     }
 }
 
-function setWordChecked(wordId) {
-    // console.log('WORD ID: ' + wordId);
+function addGroupToSelector(selector) {
+    if (selector.value === 'add') {
+        var groupName = prompt('Введите название группы');
 
+        if (groupName !== null && groupName !== '') {
+            groupName = groupName.trim();
+            groupName = groupName[0].toUpperCase() + groupName.slice(1).toLowerCase();
+
+            var groups = new Set();
+
+            for (var option of selector.options)
+                groups.add(option.value);
+
+            if (!groups.has(groupName)) {
+                var newOption = document.createElement('option');
+                newOption.innerHTML = groupName;
+                selector.appendChild(newOption);
+            }
+        }
+    }
+}
+
+function showWordsByGroup(group, pageName) {
+    var len = 0;
+
+    if (group === 'all') {
+        switch (pageName) {
+            case 'dict':
+                for (var wordCard of wordCards)
+                    wordCard.style.display = 'block';
+                len = wordCards.length;
+                break;
+            case 'game':
+                listWords.forEach((elem, idx) => {
+                    elem['is_checked'] = true;
+                    len++;
+                });
+                break;
+            case 'save':
+                var totalWords = Object.keys(listOfSelectedWords).length;
+                var totalSelectedWordsInput = document.querySelector('#amount-words');
+
+                totalSelectedWordsInput.value = totalWords;
+                selectWordsForSaveInFile(totalWords);
+                break;
+        }
+    } else {
+        switch (pageName) {
+            case 'dict':
+                listWords.forEach((elem, idx) => {
+                    var wordCard = wordCards[idx];
+
+                    if (elem.group === group) {
+                        wordCard.style.display = 'block';
+                        len++;
+                    } else {
+                        wordCards[idx].style.display = 'none';
+                    }
+                });
+                break;
+            case 'game':
+                listWords.forEach((elem, idx) => {
+                    if (group === elem['group']) {
+                        elem['is_checked'] = true;
+                        len++;
+                    }
+                });
+                break;
+            case 'save':
+                var totalChecks = selectWordsForSaveInFile(-1, group);
+                document.getElementById('amount-words').value = totalChecks;
+                break;
+        }
+    }
+
+    switch (pageName) {
+        case 'dict':
+            var totalWords = document.getElementById('total-words');
+            totalWords.innerHTML = totalWords.innerHTML.replace(/\(.*\)/, `(${len})`);
+            break;
+        case 'game':
+            var totalWordsInput = document.getElementById('total-words');
+            totalWordsInput.value = len;
+            totalWordsInput.max = len;
+            wordsInputChange(totalWordsInput, group);
+            break;
+        case 'save':
+//            var totalWords = document.getElementById('total-words');
+//            totalWords.innerHTML = totalWords.innerHTML.replace(/\(.*\)/, `(${len})`);
+            document.getElementById('opt').checked = true;
+            showHideWords('inline');
+            break;
+    }
+}
+
+function setWordChecked(wordId) {
     function setWordVisibility(isVisible) {
         for (var wordInfo of listWords) {
             if (wordInfo.original == wordCheckbox.value)
@@ -369,14 +457,14 @@ function setWordChecked(wordId) {
 //    sessionStorage.words = JSON.stringify({words: []});
 
 var listWords = [];
-function addWordsToList(wordId = -1, wordEn, wordRu, _transcription, _lang, date, _is_forgotten, _id) {
+function addWordsToList(wordId = -1, wordEn, wordRu, _transcription, _group, _lang, date, _is_forgotten, _id) {
     var _timestamp = new Date(date).getTime() / 1000;
-    // console.log('TIMESTAMP: ' + timestamp);
     var wordInfo = {
         id: _id,
         original: wordEn,
         translate: wordRu,
         transcription: _transcription,
+        group: _group,
         lang: _lang,
         is_checked: true,
         is_wrong_answer: null,
@@ -387,9 +475,7 @@ function addWordsToList(wordId = -1, wordEn, wordRu, _transcription, _lang, date
     if (wordId != - 1)
         wordInfo.id = wordId;
 
-    // listWords.push([wordEn, wordRu, true, timestamp]);
     listWords.push(wordInfo);
-    // console.log(listWords)
 }
 
 function getFormattedDateString(date) {
@@ -410,10 +496,6 @@ function sortWords(sortType = 'alphabet') {
         listWords = listWords.sort((wordInfo, wordInfo2) => wordInfo.original[0].localeCompare(wordInfo2.original[0]));
     else
         listWords = listWords.sort((wordInfo, wordInfo2) => wordInfo2.timestamp - wordInfo.timestamp);
-
-    // console.log(listWords);
-
-    // console.log(wordDeleteImgs);
 
     listWords.forEach((wordInfo, i) => {
         // Change onclick attribute to img tag
@@ -506,9 +588,16 @@ function clickOnGetWordsFromEndCheckbox(isChecked) {
 //    }
 }
 
-function wordsInputChange(input) {
+function wordsInputChange(input, group = '') {
     var totalWords = input.value;
-    var listWordsChecked = listWords.filter(wordInfo => wordInfo.is_checked);
+
+    var listWordsChecked = [];
+
+    if (group === '' || group === 'all')
+        listWordsChecked = listWords.filter(wordInfo => wordInfo.is_checked);
+    else
+        listWordsChecked = listWords.filter(wordInfo => wordInfo.group === group);
+
     var wordsLength = listWords.length;
 
     if (totalWords <= 0 || totalWords > wordsLength) {
@@ -529,15 +618,18 @@ function wordsInputChange(input) {
                 document.getElementById(`word_${i}`).checked = state;
                 listWords[i].is_checked = state;
             }
-            // console.log(listWords);
         } else {
             for (var i = 0; i < wordsLength; i++) {
-                var state;
+                var state = false;
 
-                if (i < totalWords)
-                    state = true;
+                if (group === '' || group === 'all')
+                    state = i < totalWords;
                 else
-                    state = false;
+                    state = listWords[i].group === group;
+//                if (i < totalWords)
+//                    state = true;
+//                else
+//                    state = false;
 
                 document.getElementById(`word_${i}`).checked = state;
                 listWords[i].is_checked = state;
@@ -648,13 +740,11 @@ function shuffle(listWords=null) {
 
 function setOriginalWord(lang) {
     listWords = JSON.parse(sessionStorage.getItem('words')).words;
-    // console.log(listWords);
 
     var wordInfo = listWords[wordIndex];
 
     originalWord.innerHTML = wordInfo[lang != 'RU' ? 'original' : 'translate'];
 
-    // console.log(originalWord.innerHTML)
     transcriptionWord.innerHTML = wordInfo.transcription ? wordInfo.transcription : '';
 }
 
@@ -735,8 +825,6 @@ function checkTranslateWord(checkBtn) {
 
         if (isAnswerRight) {
             // rightAnswersCount++;
-//            console.log(wordIndex);
-//            console.log('IS RIGHT:', listWords[wordIndex - 1].is_wrong_answer);
             if (listWords[wordIndex - 1].is_wrong_answer == null)
                 listWords[wordIndex - 1].is_wrong_answer = false;
             // imgUrl = '/static/img/right_answer_icon.png';
@@ -744,7 +832,6 @@ function checkTranslateWord(checkBtn) {
         } else {
             // wrongAnswersCount++;
             // rightAnswerLabel.innerHTML = answer;
-            // console.log(wordIndex)
             listWords[wordIndex - 1].is_wrong_answer = true;
             // imgUrl = '/static/img/wrong_answer_icon.png';
             questionStatusImg.src = '/static/img/wrong_answer_icon.png';
@@ -911,7 +998,6 @@ function checkTranslateWord(checkBtn) {
                         }
 
                         document.body.addEventListener('keydown', function setStatActions(event) {
-                            console.log('KEYDOWN')
                             switch(event.code) {
                                 case 'Enter':
                                     restartGame(true);

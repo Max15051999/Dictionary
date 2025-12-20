@@ -55,7 +55,22 @@
                     {% for foreign_lang in foreign_langs|items %}
                         <option name="{{foreign_lang.0}}">{{foreign_lang.1}}</option>
                     {% endfor %}
-                </select></td>
+                </select>
+                <select id="groups-selector" name="group" onclick="addGroupToSelector(this);">
+                    <option value="add">Добавить группу</option>
+                    <option value="empty">Без группы</option>
+                    {% if groups|length > 0 %}
+                        {% for group in groups %}
+                            {% if current_group == group.0 %}
+                                <option selected>{{group.0}}</option>
+                            {% else %}
+                                <option>{{group.0}}</option>
+                            {% endif %}
+                        {% endfor %}
+                    {% endif %}
+                </select>
+                </td>
+
                 <td></td>
                 <td></td>
             </tr>

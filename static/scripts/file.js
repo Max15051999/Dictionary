@@ -1,7 +1,8 @@
 'use strict'
 
-var listOfWords = []
-var listOfSelectedWords = []
+// var listOfWords = [];
+//var listOfSelectedWords = [];
+var listOfSelectedWords = {};
 // listOfSelectedWords.unshift('Original,Translate')
 
 function createFile() {
@@ -17,7 +18,11 @@ function createFile() {
 
     var a = document.getElementById('download-file');
 
-    var content = listOfSelectedWords.join('\n');
+    var delimiter = document.getElementById('delimiter').value;
+
+    var content = Object.entries(listOfSelectedWords).filter((wordInfo) => wordInfo[1]).map((wordInfo) => wordInfo[0].replace(',', delimiter)).join('\n');
+
+    content = `Original${delimiter}Translation${delimiter}Transcription${delimiter}Group\n` + content;
 
     var blob;
     var extension;
@@ -44,57 +49,68 @@ function showHideWords(displayState) {
     amountWords.style.display = displayState;
     selectWordsBtn.style.display = displayState;
     wordsTable.style.display = displayState;
+
+    if (displayState === 'none') {
+        var totalWords = Object.keys(listOfSelectedWords).length;
+        var totalSelectedWordsInput = document.querySelector('#amount-words');
+
+        totalSelectedWordsInput.value = totalWords;
+        selectWordsForSaveInFile(totalWords);
+    }
 }
 
-function selectWordsForSaveInFile(totalWords) {
+function selectWordsForSaveInFile(totalWords, group = '') {
     var tableWithWords = document.querySelector('#words-table');
     var rows = tableWithWords.rows;
     var index = 0;
-
-    listOfSelectedWords.length = 0;
+    var totalChecks = 0;
 
     for (var row of rows) {
-        var checkbox = document.getElementById(`words-ckbox_${index}`);
-        var wordState;
-
-        if (index + 1 <= totalWords) {
-            wordState = true;
-            listOfSelectedWords.push(listOfWords[index]);
-        } else {
-            wordState = false;
+        if (index === 0) {
+            index++;
+            continue;
         }
 
+        var checkbox = row['cells'][0]['childNodes'][0];
+        var wordState;
+        var rowPattern = `${row['cells'][1]['childNodes'][0].innerHTML},${row['cells'][2]['childNodes'][0].innerHTML},${row['cells'][3]['childNodes'][0].innerHTML},${row['cells'][4]['childNodes'][0].innerHTML}`;
 
+        if (group.length > 0) {
+            wordState = rowPattern.split(',')[3] === group;
+            totalChecks += wordState;
+        } else {
+            if (index <= totalWords)
+                wordState = true;
+            else
+                wordState = false;
+        }
+
+        listOfSelectedWords[rowPattern] = wordState;
         checkbox.checked = wordState;
         index++;
     }
 
-    // console.log(listOfSelectedWords);
+    if (group.length === 0)
+        document.getElementById('groups-selector').selectedIndex = 0;
+
+    return totalChecks;
 }
 
-function changeDelimiter() {
-
-}
-
-function incrementDecrementSelectedWordsAmount(isIncrement, originalWord, translateWord) {
+function incrementDecrementSelectedWordsAmount(checkbox, rowPattern) {
     var totalSelectedWordsInput = document.querySelector('#amount-words');
     var totalSelectedWords = +totalSelectedWordsInput.value;
-    var delimiter = document.getElementById('delimiter').target.value;
-    var rowPattern = `${originalWord}${delimiter}${translateWord}`;
 
-    if (isIncrement) {
+    if (checkbox.checked) {
         totalSelectedWords++;
-        listOfSelectedWords.push(rowPattern);
+        listOfSelectedWords[rowPattern] = true;
     } else {
-        totalSelectedWords--;
-        var index = listOfSelectedWords.indexOf(rowPattern);
-
-        if (index !== -1)
-            listOfSelectedWords.splice(index, 1);
+        if (totalSelectedWords > 1) {
+            totalSelectedWords--;
+            listOfSelectedWords[rowPattern] = false;
+        } else {
+            checkbox.checked = true;
+        }
     }
 
-
     totalSelectedWordsInput.value = totalSelectedWords;
-
-    // console.log(listOfSelectedWords);
 }

@@ -28,9 +28,12 @@ def translate(is_word_in_dictionary: bool = False, has_word_add: bool = False, l
   service_name = help_funcs.open_json(config.SERVICE_JSON_NAME)
   is_service_google = service_name == config.GOOGLE_SEVICE_NAME
 
+  db = help_funcs.connect_to_db()
+  groups = db.query_execute(queries.SELECT_ALL_GROUPS, is_fetch_all=True)
+
   return render_template('translate.html', is_service_google=is_service_google,
                is_word_in_dictionary=is_word_in_dictionary, has_word_add=has_word_add,
-               _from=lang_from, to=lang_to,
+               _from=lang_from, to=lang_to, groups=groups,
                foreign_langs={foreign_lang.name : foreign_lang.value for foreign_lang in ForeignLang})
 
 
@@ -163,14 +166,20 @@ def statistic(lang_code: str, total_words: str, right_answers_count: str, wrong_
 
 @app.route('/dictionary/<lang>/download/', methods=['GET'])
 def download_dictionary(lang: str):
-  title = f'Скачать словарь на {lang}'
+  lang_name = ForeignLang.get_lang_by_code(lang)
+  lang_name = lang_name[:-2] + 'ом' if lang_name.endswith('ий') else lang_name
+
+  title = f'Скачать словарь на {lang_name}'
   words = help_funcs.get_words_from_concrete_dictionary(lang)
   return render_template('download_upload_dictionary.html', title=title, words=words)
 
 
 @app.route('/dictionary/<lang>/upload/', methods=['GET'])
 def upload_dictionary(lang: str):
-  title = f'Загрузить словарь на {lang}'
+  lang_name = ForeignLang.get_lang_by_code(lang)
+  lang_name = lang_name[:-2] + 'ом' if lang_name.endswith('ий') else lang_name
+
+  title = f'Загрузить словарь на {lang_name}'
   return render_template('download_upload_dictionary.html', title=title, lang=lang)
 
 
@@ -272,13 +281,16 @@ def get_translate(word: str, _from: str, to: str):
     else:
       translate_word += translate_db[1]
 
-  return render_template('translate.html', _from=_from, to=to,
+  db = help_funcs.connect_to_db()
+  groups = db.query_execute(queries.SELECT_ALL_GROUPS, is_fetch_all=True)
+
+  return render_template('translate.html', _from=_from, to=to, groups=groups,
                word=word, trans=translate_word, is_err=is_err, is_service_google=is_service_google,
                foreign_langs={foreign_lang.name : foreign_lang.value for foreign_lang in ForeignLang})
 
 
-@app.route('/add_new_word/<word1>/<word2>/<first_lang>/<second_lang>/')
-def add_word_in_db(word1: str, word2: str, first_lang: str, second_lang: str):
+@app.route('/add_new_word/<word1>/<word2>/<group>/<first_lang>/<second_lang>/')
+def add_word_in_db(word1: str, word2: str, group: str, first_lang: str, second_lang: str):
   original_word = (word2 if first_lang == config.RU_LANG_ALIAS else word1).capitalize()
   russian_word = (word1 if first_lang == config.RU_LANG_ALIAS else word2).capitalize()
 
@@ -292,7 +304,7 @@ def add_word_in_db(word1: str, word2: str, first_lang: str, second_lang: str):
   if help_funcs.check_if_word_in_db(original_word, first_lang):
     return translate(is_word_in_dictionary=True)
 
-  help_funcs.add_word_in_db(original_word, russian_word, transcription,
+  help_funcs.add_word_in_db(original_word, russian_word, transcription, group,
                             first_lang if first_lang != config.RU_LANG_ALIAS else second_lang)
 
   return translate(has_word_add=True, lang_from=first_lang, lang_to=second_lang)
@@ -336,9 +348,9 @@ def delete_note():
   return show_notes(lang)
 
 
-@app.route('/dictionary/<dictionary_lang>/change/<word_id>/<word_en>/<word_ru>/<transcription>/',
+@app.route('/dictionary/<dictionary_lang>/change/<word_id>/<word_en>/<word_ru>/<group>/<transcription>/',
        methods=['GET', 'POST'])
-def change_word(dictionary_lang: str, word_id: str, word_en: str, word_ru: str, transcription: str):
+def change_word(dictionary_lang: str, word_id: str, word_en: str, word_ru: str, group: str, transcription: str):
   title = 'Изменить слово'
   word_id = int(word_id)
   msg = ''
@@ -349,21 +361,24 @@ def change_word(dictionary_lang: str, word_id: str, word_en: str, word_ru: str, 
 
   lang_code = None
   if request.method == 'POST':
-    is_err, word_en, word_ru, transcription, lang_code = help_funcs.prepare_words_and_check(request)
+    is_err, word_en, word_ru, transcription, group, lang_code = help_funcs.prepare_words_and_check(request)
 
     if not is_err:
       db = help_funcs.connect_to_db()
-      db.query_execute(queries.UPDATE_WORD_BY_ID, params=(word_en, word_ru, transcription, lang_code, word_id))
+      db.query_execute(queries.UPDATE_WORD_BY_ID, params=(word_en, word_ru, transcription, group, lang_code, word_id))
       msg = 'Слово успешно изменено'
     else:
       msg = 'Ошибка изменения слова'
 
   lang_code = lang_code if lang_code else dictionary_lang
 
+  db = help_funcs.connect_to_db()
+  groups = db.query_execute(queries.SELECT_ALL_GROUPS, is_fetch_all=True)
+
   return render_template('add_change_word.html', title=title, msg=msg,
                word_id=word_id, word_en=word_en, word_ru=word_ru,
                transcription=transcription, my_langs={lang.name : lang.value[:-2] + 'ом' if lang.value.endswith('ий') else lang.value
-                                  for lang in ForeignLang}, lang=lang_code,
+                                  for lang in ForeignLang}, groups=groups, current_group=group, lang=lang_code,
                href_back=f'/dictionary/{dictionary_lang}/')
 
 
@@ -374,19 +389,22 @@ def add_new_word():
 
   lang = None
   if request.method == 'POST':
-    is_err, word_original, word_ru, transcription, lang = help_funcs.prepare_words_and_check(request)
+    is_err, word_original, word_ru, transcription, group, lang = help_funcs.prepare_words_and_check(request)
 
     if is_err:
       msg = 'Ошибка добавления слова'
     elif help_funcs.check_if_word_in_db(word_original, lang):
       msg = 'Данное слово уже содержится в словаре'
     else:
-      help_funcs.add_word_in_db(word_original, word_ru, transcription, lang)
+      help_funcs.add_word_in_db(word_original, word_ru, transcription, group, lang)
       msg = 'Слово успешно добавлено в словарь'
+
+  db = help_funcs.connect_to_db()
+  groups = db.query_execute(queries.SELECT_ALL_GROUPS, is_fetch_all=True)
 
   return render_template('add_change_word.html', title=title,
                msg=msg, my_langs={lang.name : lang.value[:-2] + 'ом' if lang.value.endswith('ий') else lang.value
-                                  for lang in ForeignLang}, lang=lang, href_back='/')
+                                  for lang in ForeignLang}, groups=groups, lang=lang, href_back='/')
 
 
 @app.route('/langs_notes/<lang>/add_new_note/', methods=['GET', 'POST'])
@@ -492,8 +510,13 @@ def search_note_card(lang: str, word_part: str):
 def update_service(service: str, first_lang: str, second_lang: str):
   help_funcs.open_json(config.SERVICE_JSON_NAME, mode='w', service_name=service)
   is_service_google = service == config.GOOGLE_SEVICE_NAME
+
+  db = help_funcs.connect_to_db()
+  groups = db.query_execute(queries.SELECT_ALL_GROUPS, is_fetch_all=True)
+
   return render_template('translate.html', is_service_google=is_service_google, _from=first_lang,
-               to=second_lang, foreign_langs={foreign_lang.name : foreign_lang.value for foreign_lang in ForeignLang})
+               to=second_lang, foreign_langs={foreign_lang.name : foreign_lang.value for foreign_lang in ForeignLang},
+                         groups=groups)
 
 
 @app.route('/upload_file/<lang>/', methods=['POST'])
@@ -512,4 +535,3 @@ def upload_file(lang: str):
   remove(file_full_path)
 
   return render_template('dictionary.html', upload_new_words=True, lang=lang)
-
