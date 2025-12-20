@@ -332,6 +332,7 @@ function addGroupToSelector(selector) {
                 var newOption = document.createElement('option');
                 newOption.innerHTML = groupName;
                 selector.appendChild(newOption);
+                selector.selectedIndex = 1;
             }
         }
     }
