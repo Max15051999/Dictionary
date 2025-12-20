@@ -503,6 +503,7 @@ function sortWords(sortType = 'alphabet') {
         var translate = wordInfo.translate;
         var transcription = wordInfo.transcription;
         var lang = wordInfo.lang;
+        var group = wordInfo.group;
         var wordCard = wordCards[i];
 
 //        wordSayImgs[i].setAttribute('onclick', `sayWord("${original}", '${lang}');`)
@@ -525,7 +526,7 @@ function sortWords(sortType = 'alphabet') {
         wordCard.getElementsByClassName('transcription')[0].innerHTML = transcription;
         wordCard.getElementsByClassName('date-to-add')[0].innerHTML = wordFormattedDate;
         wordCard.getElementsByClassName('word-delete')[0].setAttribute('onclick', `deleteWord(${wordInfo.id}, "${original}")`);
-        wordCard.getElementsByClassName('word-change')[0].href = `${window.location.href}change/${wordInfo.id}/${original}/${translate}/${transcription ? transcription : 'ES'}/`;
+        wordCard.getElementsByClassName('word-change')[0].href = `${window.location.href}change/${wordInfo.id}/${original}/${translate}/${group ? group : 'ES'}/${transcription ? transcription : 'ES'}/`;
     });
 }
 
