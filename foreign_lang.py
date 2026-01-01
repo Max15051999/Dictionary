@@ -6,6 +6,8 @@ class ForeignLang(Enum):
 	EN = 'Английский'
 	DE = 'Немецкий'
 	IT = 'Итальянский'
+	UK = 'Украинский'
+	EO = 'Эсперанто'
 
 	@staticmethod
 	def get_lang_by_code(code: str, word_end=None) -> Union[str, None]:
