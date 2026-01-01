@@ -28,6 +28,10 @@ body {
     }
 }
 
+.note-title {
+    color: orange;
+}
+
 .date-to-add {
     color: DarkRed;
 }
