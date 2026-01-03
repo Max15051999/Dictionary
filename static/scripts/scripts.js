@@ -368,7 +368,7 @@ function showWordsByGroup(group, pageName) {
                 listWords.forEach((elem, idx) => {
                     var wordCard = wordCards[idx];
 
-                    if (elem.group === group) {
+                    if (elem.group === (group === 'without_group' ? '' : group)) {
                         wordCard.style.display = 'block';
                         len++;
                     } else {
@@ -378,7 +378,7 @@ function showWordsByGroup(group, pageName) {
                 break;
             case 'game':
                 listWords.forEach((elem, idx) => {
-                    if (group === elem['group']) {
+                    if (elem['group'] === (group === 'without_group' ? '' : group)) {
                         elem['is_checked'] = true;
                         len++;
                     }
@@ -595,7 +595,7 @@ function wordsInputChange(input, group = '') {
 
     var listWordsChecked = [];
 
-    if (group === '' || group === 'all')
+    if (group === '' || group === 'all' || group === 'without_group')
         listWordsChecked = listWords.filter(wordInfo => wordInfo.is_checked);
     else
         listWordsChecked = listWords.filter(wordInfo => wordInfo.group === group);
@@ -626,6 +626,8 @@ function wordsInputChange(input, group = '') {
 
                 if (group === '' || group === 'all')
                     state = i < totalWords;
+                else if (group === 'without_group')
+                    state = listWords[i].group === '';
                 else
                     state = listWords[i].group === group;
 //                if (i < totalWords)

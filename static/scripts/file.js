@@ -76,7 +76,7 @@ function selectWordsForSaveInFile(totalWords, group = '') {
         var rowPattern = `${row['cells'][1]['childNodes'][0].innerHTML},${row['cells'][2]['childNodes'][0].innerHTML},${row['cells'][3]['childNodes'][0].innerHTML},${row['cells'][4]['childNodes'][0].innerHTML}`;
 
         if (group.length > 0) {
-            wordState = rowPattern.split(',')[3] === group;
+            wordState = rowPattern.split(',')[3] === (group === 'without_group' ? '' : group);
             totalChecks += wordState;
         } else {
             if (index <= totalWords)

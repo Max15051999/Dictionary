@@ -44,7 +44,8 @@
                     </td>
                     <td>
                         <select id="groups-selector" onchange="showWordsByGroup(this.value, 'save');">
-                            <option value="all">Все группы</option>
+                            <option value="all">Все слова</option>
+                            <option value="without_group">Без группы</option>
                         </select>
                     </td>
                 </tr>
@@ -82,8 +83,6 @@
                             originalDecoded = parse('{{word.0}}');
                             translateDecoded = parse('{{word.1}}');
                             transcriptionDecoded = parse('{{word.2}}');
-
-                            console.log('{{word.2}}');
 
                             if ('{{word.7}}'.length > 0 && !uniqueGroups.has('{{word.7}}')) {
                                 var option = document.createElement('option');
@@ -129,8 +128,5 @@
         <a href=".." title="Нажмите"><button>Назад</button></a>
     </div>
     <script src="{{url_for('static', filename='scripts/theme.js')}}"></script>
-    <script>
-        console.log(listOfSelectedWords);
-    </script>
 </body>
 </html>
