@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" charset="UTF-8">
+    <title>БД</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/index.css') }}">
+    <link rel="icon" href="{{ url_for('static', filename='img/favicon.png') }}" type="image/png">
+</head>
+<body>
+  <script>
+      if ('{{msg}}' !== '')
+        alert('{{msg}}');
+  </script>
+  <div class="container">
+    {% include 'theme.html' %}
+    <h1>Управление БД {{dbname}}</h1>
+    <hr><br><br>
+    <form enctype="multipart/form-data" action="." method="post">
+        <button name="action" value="delete">Удалить</button><br><br>
+        <button id="update-db-btn" name="action" value="update" style="width: 31%;" disabled>Обновить</button><input onchange="chooseFile(this);" type="file" accept=".db" name="file"><br><br>
+        <button name="action" value="save">Скачать</button>
+    </form>
+    <hr><br><br>
+      {% for table in tables %}
+      <table style="width: 100%; background-color: silver;">
+          <caption><b>{{table.0}}</b></caption>
+          {% for rows in tables_rows_dct[table.0] %}
+            <tr>
+                {% for row in rows %}
+                    <td>{{row}}</td>
+                {% endfor %}
+            </tr>
+          {% endfor %}
+      </table>
+      <hr><br><br>
+      {% endfor %}
+    </div>
+  <script src="{{url_for('static', filename='scripts/theme.js')}}"></script>
+  <script>
+      var updateDBBtn = document.getElementById('update-db-btn');
+
+      function chooseFile(input) {
+          updateDBBtn.disabled = !(input.files && input.files.length > 0 && input.files[0].name.endsWith('.db'));
+      }
+  </script>
+</body>
+</html>

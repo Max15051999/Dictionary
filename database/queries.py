@@ -1,5 +1,11 @@
 import config
 
+SELECT_ALL_TABLES = """ SELECT name FROM sqlite_master WHERE type='table' ORDER BY name; """
+
+SELECT_ALL_ROWS_FROM_TABLE = lambda table_name : f""" SELECT * FROM {table_name}; """
+
+SELECT_TABLE_COLUMNS = lambda table_name : f""" SELECT name FROM PRAGMA_TABLE_INFO('{table_name}'); """
+
 CREATE_NOTES_TABLE = f""" CREATE TABLE IF NOT EXISTS {config.NOTES_TABLE_NAME} (
                                                             id integer primary key autoincrement,
                                                             title text,

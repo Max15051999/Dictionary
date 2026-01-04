@@ -1,5 +1,5 @@
 from typing import List
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, send_file
 import requests
 from bs4 import BeautifulSoup
 import help_funcs
@@ -11,6 +11,49 @@ from os.path import exists
 import json
 
 app = Flask(__name__)
+
+
+@app.route('/db/', methods=['GET', 'POST'])
+def manipulate_db():
+  msg = ''
+  if request.method == 'POST':
+    action_type = request.form.get('action')
+
+    if action_type == 'delete':
+      if exists(config.PATH_TO_DB):
+        remove(config.PATH_TO_DB)
+        msg = 'БД успешно удалена'
+      else:
+        msg = 'БД не существует'
+
+    elif action_type == 'update':
+      new_db = request.files['file']
+
+      if new_db.filename.endswith('.db'):
+        if exists(config.PATH_TO_DB):
+          remove(config.PATH_TO_DB)
+
+        new_db.save(config.PATH_TO_DB)
+
+        msg = 'БД успешно обновлена'
+      else:
+        msg = 'Неправильное расширение файла. Файл должен быть с расширением .db'
+
+    elif action_type == 'save':
+      return send_file(config.PATH_TO_DB, download_name='dictionary.db')
+
+  db = help_funcs.connect_to_db()
+  tables = db.query_execute(queries.SELECT_ALL_TABLES, is_fetch_all=True)
+  tables_rows_dct = {}
+
+  for table in tables:
+    table_name = table[0]
+    rows = db.query_execute(queries.SELECT_ALL_ROWS_FROM_TABLE(table_name), is_fetch_all=True)
+    columns = db.query_execute(queries.SELECT_TABLE_COLUMNS(table_name), is_fetch_all=True)
+    rows = [[column[0] for column in columns]] + rows
+    tables_rows_dct[table_name] = rows
+
+  return render_template('database.html', dbname=config.PATH_TO_DB, tables=tables, tables_rows_dct=tables_rows_dct, msg=msg)
 
 
 @app.route('/')
