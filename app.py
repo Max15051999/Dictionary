@@ -12,6 +12,11 @@ import json
 
 app = Flask(__name__)
 
+# Before starting service
+with app.app_context():
+  load_result = help_funcs.load_db_from_gist()
+  print(load_result)
+
 
 @app.route('/db/', methods=['GET', 'POST'])
 def manipulate_db():

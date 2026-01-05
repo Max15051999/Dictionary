@@ -1,8 +1,11 @@
+import requests
+import base64
 import config
 import json
 from database import database, queries
 from typing import Union, Tuple, List
 from datetime import datetime
+
 
 def open_json(json_name: str, mode: str = 'r', service_name: str = config.GOOGLE_SEVICE_NAME):
 	with open(file=json_name, mode=mode, encoding='UTF-8') as ff:
@@ -189,3 +192,38 @@ def read_words_from_file_and_add_to_dict(file_path: str, lang: str, delimiter: s
 				group = ''
 
 			add_word_in_db(original_word, translate_word, transcription, group, lang)
+
+
+def load_db_from_gist() -> bool:
+	if not config.GIST_API_URL:
+		return False
+
+	try:
+		response = requests.get(config.GIST_API_URL, headers=config.GIST_HEADERS)
+	except Exception:
+		return False
+
+	data: dict = response.json()
+
+	if not data:
+		return False
+
+	files: dict = data.get('files', {})
+
+	if not files:
+		return False
+
+	db_info: dict = files.get(config.DB_NAME)
+	content: str = db_info.get('content')
+
+	if not content:
+		return False
+
+	try:
+		db_binary = base64.b64decode(content)
+	except Exception:
+		db_binary = content.encode('utf-8')
+
+	with open(config.PATH_TO_DB, 'wb') as f:
+		f.write(db_binary)
+		return True

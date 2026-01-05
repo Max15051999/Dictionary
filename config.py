@@ -1,3 +1,5 @@
+from os import getenv
+
 HEADERS = {
 	'User-Agent' : 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36'
 }
@@ -15,12 +17,14 @@ GOOGLE_API = f'https://script.google.com/macros/s/{GOOGLE_API_KEY}/exec?q=%s&tar
 SERVICE_JSON_NAME = 'service/service.json'
 FILES_DIR_PATH = 'files/'
 GOOGLE_SEVICE_NAME = 'google'
-WORDS_TABLE_NAME = 'words'
-NOTES_TABLE_NAME = 'notes'
+WORDHUNT_SERVICE_NAME = 'wordhunt'
 
 RESPONSE_OK_STATUS_CODE = 200
 
-PATH_TO_DB = 'database/test.db'
+DB_NAME = 'test.db'
+PATH_TO_DB = f'database/{DB_NAME}'
+WORDS_TABLE_NAME = 'words'
+NOTES_TABLE_NAME = 'notes'
 
 TABLE_FIELDS = {
 	'id' : 'integer primary key autoincrement',
@@ -36,3 +40,15 @@ TABLE_FIELDS = {
 RU_LANG_ALIAS = 'RU'
 EN_LANG_ALIAS = 'EN'
 TRANSCRIPTION_BRACE = '|'
+
+GIST_ID = getenv('GIST_ID')
+
+TOKEN = getenv('TOKEN')
+
+GIST_API_URL = f'https://api.github.com/gists/{GIST_ID}' if GIST_ID else ''
+
+GIST_HEADERS = {
+    'Authorization': f'token {TOKEN}',
+    'Accept': 'application/vnd.github+json',
+    'X-GitHub-Api-Version': '2022-11-28'
+}
