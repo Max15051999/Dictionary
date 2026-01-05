@@ -195,6 +195,7 @@ def read_words_from_file_and_add_to_dict(file_path: str, lang: str, delimiter: s
 
 
 def load_db_from_gist() -> bool:
+
 	if not config.GIST_API_URL:
 		return False
 
@@ -227,3 +228,21 @@ def load_db_from_gist() -> bool:
 	with open(config.PATH_TO_DB, 'wb') as f:
 		f.write(db_binary)
 		return True
+
+
+def save_db_to_gist() -> bool:
+	with open(config.PATH_TO_DB, 'rb') as f:
+		db_binary = f.read()
+
+	encoded = base64.b64encode(db_binary).decode('utf-8')
+
+	data = {
+		'files': {config.DB_NAME: {'content': encoded}},
+		'description': 'SQLite Database',
+	}
+
+	try:
+		requests.patch(config.GIST_API_URL, headers=config.GIST_HEADERS, data=json.dumps(data))
+		return True
+	except Exception:
+		return False

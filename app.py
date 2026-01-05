@@ -9,8 +9,17 @@ from foreign_lang import ForeignLang
 from os import remove, makedirs
 from os.path import exists
 import json
+import atexit
+import signal
 
 app = Flask(__name__)
+
+
+def shutdown():
+  help_funcs.save_db_to_gist()
+
+atexit.register(shutdown)
+signal.signal(signal.SIGTERM, lambda s, f: help_funcs.save_db_to_gist())
 
 # Before starting service
 with app.app_context():
