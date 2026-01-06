@@ -231,6 +231,10 @@ def load_db_from_gist() -> bool:
 
 
 def save_db_to_gist() -> bool:
+
+	if not config.GIST_API_URL:
+		return False
+
 	with open(config.PATH_TO_DB, 'rb') as f:
 		db_binary = f.read()
 
