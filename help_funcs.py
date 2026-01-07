@@ -1,3 +1,4 @@
+import hashlib
 import requests
 import base64
 import config
@@ -8,245 +9,254 @@ from datetime import datetime
 
 
 def open_json(json_name: str, mode: str = 'r', service_name: str = config.GOOGLE_SEVICE_NAME):
-	with open(file=json_name, mode=mode, encoding='UTF-8') as ff:
-		if mode == 'r':
-			service_name = json.load(ff)['service']
-			return service_name
-		else:
-			json.dump({'service': service_name}, ff)
+    with open(file=json_name, mode=mode, encoding='UTF-8') as ff:
+        if mode == 'r':
+            service_name = json.load(ff)['service']
+            return service_name
+        else:
+            json.dump({'service': service_name}, ff)
 
 def connect_to_db(db_name: str = config.PATH_TO_DB) -> database.DB:
-	db = database.DB(db_name)
-	return db
+    db = database.DB(db_name)
+    return db
 
 def get_translate_by_word(word: str, first_lang: str, is_part_word: bool, second_lang: str = None) -> Union[Tuple[str, str], None]:
-	db = connect_to_db()
+    db = connect_to_db()
 
-	word = word.capitalize()
-	is_first_part = len(word) == 1
+    word = word.capitalize()
+    is_first_part = len(word) == 1
 
-	# if first_lang == ForeignLang.EN.name:
-	# 	query = queries.GET_TRANSLATE_AND_TRANSCRIPTION_BY_ENGLISH_WORD(is_part_word, is_first_part)
-	# 	params = [word, first_lang]
-	# elif first_lang == ForeignLang.DE.name:
-	# 	query = queries.GET_TRANSLATE_AND_TRANSCRIPTION_BY_DEUTSCH_WORD(is_part_word, is_first_part)
-	# 	params = [word, first_lang]
-	# elif first_lang == config.RU_LANG_ALIAS:
-	# 	query = queries.GET_TRANSLATE_AND_TRANSCRIPTION_BY_RUSSIAN_WORD(is_part_word, is_first_part)
-	# 	params = [word, second_lang]
-	# else:
-	# 	return None
+    # if first_lang == ForeignLang.EN.name:
+    # 	query = queries.GET_TRANSLATE_AND_TRANSCRIPTION_BY_ENGLISH_WORD(is_part_word, is_first_part)
+    # 	params = [word, first_lang]
+    # elif first_lang == ForeignLang.DE.name:
+    # 	query = queries.GET_TRANSLATE_AND_TRANSCRIPTION_BY_DEUTSCH_WORD(is_part_word, is_first_part)
+    # 	params = [word, first_lang]
+    # elif first_lang == config.RU_LANG_ALIAS:
+    # 	query = queries.GET_TRANSLATE_AND_TRANSCRIPTION_BY_RUSSIAN_WORD(is_part_word, is_first_part)
+    # 	params = [word, second_lang]
+    # else:
+    # 	return None
 
-	if first_lang != config.RU_LANG_ALIAS:
-		query = queries.GET_TRANSLATE_AND_TRANSCRIPTION_BY_FOREIGN_WORD(is_part_word, is_first_part)
-		params = [word, first_lang]
-	else:
-		query = queries.GET_TRANSLATE_AND_TRANSCRIPTION_BY_RUSSIAN_WORD(is_part_word, is_first_part)
-		params = [word, second_lang]
+    if first_lang != config.RU_LANG_ALIAS:
+        query = queries.GET_TRANSLATE_AND_TRANSCRIPTION_BY_FOREIGN_WORD(is_part_word, is_first_part)
+        params = [word, first_lang]
+    else:
+        query = queries.GET_TRANSLATE_AND_TRANSCRIPTION_BY_RUSSIAN_WORD(is_part_word, is_first_part)
+        params = [word, second_lang]
 
-	translate = db.query_execute(query, params=tuple(params), is_fetch_one=not is_part_word, is_fetch_all=is_part_word)
+    translate = db.query_execute(query, params=tuple(params), is_fetch_one=not is_part_word, is_fetch_all=is_part_word)
 
-	if not translate:
-		word = word.lower()
-		params[0] = word
-		# query = queries.GET_TRANSLATE_AND_TRANSCRIPTION_BY_ENGLISH_WORD(is_part_word, is_first_part) if foreign_lang == config.RU_LANG_ALIAS \
-		# 	else queries.GET_TRANSLATE_AND_TRANSCRIPTION_BY_RUSSIAN_WORD(is_part_word, is_first_part)
+    if not translate:
+        word = word.lower()
+        params[0] = word
+        # query = queries.GET_TRANSLATE_AND_TRANSCRIPTION_BY_ENGLISH_WORD(is_part_word, is_first_part) if foreign_lang == config.RU_LANG_ALIAS \
+        # 	else queries.GET_TRANSLATE_AND_TRANSCRIPTION_BY_RUSSIAN_WORD(is_part_word, is_first_part)
 
-		translate = db.query_execute(query, params=tuple(params), is_fetch_one=not is_part_word, is_fetch_all=is_part_word)
+        translate = db.query_execute(query, params=tuple(params), is_fetch_one=not is_part_word, is_fetch_all=is_part_word)
 
-	return translate
+    return translate
 
 def check_if_word_in_db(original_word: str, lang: str) -> bool:
-	db = connect_to_db()
+    db = connect_to_db()
 
-	word = original_word.capitalize()
+    word = original_word.capitalize()
 
-	for i in range(2):
-		word_in_db = db.query_execute(queries.GET_WORDS_AMOUNT_BY_ORIGINAL_WORD, params=(lang, word), is_fetch_one=True)[0]
+    for i in range(2):
+        word_in_db = db.query_execute(queries.GET_WORDS_AMOUNT_BY_ORIGINAL_WORD, params=(lang, word), is_fetch_one=True)[0]
 
-		if word_in_db == 0:
-			word = word.lower()
-		else:
-			return True
-	return False
+        if word_in_db == 0:
+            word = word.lower()
+        else:
+            return True
+    return False
 
 def add_word_in_db(original_word: str, word_ru: str, transcription: str, group: str, lang: str):
-	original_word = original_word.replace("'", 'z*z').title().replace('z*Z', "'")
-	word_ru = word_ru.capitalize()
-	transcription = transcription.capitalize()
-	current_date = datetime.now().strftime(config.CURRENT_DATE_PATTERN)
+    original_word = original_word.replace("'", 'z*z').title().replace('z*Z', "'")
+    word_ru = word_ru.capitalize()
+    transcription = transcription.capitalize()
+    current_date = datetime.now().strftime(config.CURRENT_DATE_PATTERN)
 
-	if group in ('add', 'empty'):
-		group = ''
+    if group in ('add', 'empty'):
+        group = ''
 
-	if original_word:
-		db = connect_to_db()
-		db.query_execute(queries.INSERT_NEW_WORD, params=(original_word, word_ru, transcription, group, lang, current_date))
+    if original_word:
+        db = connect_to_db()
+        db.query_execute(queries.INSERT_NEW_WORD, params=(original_word, word_ru, transcription, group, lang, current_date))
 
 
 def add_note_in_db(note_title: str, note_content: str, lang: str):
-	current_date = datetime.now().strftime(config.CURRENT_DATE_PATTERN)
+    current_date = datetime.now().strftime(config.CURRENT_DATE_PATTERN)
 
-	db = connect_to_db()
-	db.query_execute(queries.INSERT_NEW_NOTE, params=(note_title, note_content, lang, current_date))
+    db = connect_to_db()
+    db.query_execute(queries.INSERT_NEW_NOTE, params=(note_title, note_content, lang, current_date))
 
 
 def search_words(word_part: str, lang: str) -> List[Tuple[int, str, str, str, int]]:
-	db = connect_to_db()
+    db = connect_to_db()
 
-	is_en = False
-	words = get_translate_by_word(word_part, first_lang=lang, is_part_word=True)
+    is_en = False
+    words = get_translate_by_word(word_part, first_lang=lang, is_part_word=True)
 
-	if not words:
-		is_en = True
-		words = get_translate_by_word(word_part, first_lang=config.RU_LANG_ALIAS, second_lang=lang, is_part_word=True)
+    if not words:
+        is_en = True
+        words = get_translate_by_word(word_part, first_lang=config.RU_LANG_ALIAS, second_lang=lang, is_part_word=True)
 
-	if not words:
-		return []
+    if not words:
+        return []
 
-	find_words = []
-	search_field_name = 'original' if is_en else 'translate'
+    find_words = []
+    search_field_name = 'original' if is_en else 'translate'
 
-	for word in words:
-		word_full_info = db.query_execute(queries.GET_WORD_FULL_INFO_BY_WORD(search_field_name), params=(word[0], lang), is_fetch_one=True)
+    for word in words:
+        word_full_info = db.query_execute(queries.GET_WORD_FULL_INFO_BY_WORD(search_field_name), params=(word[0], lang), is_fetch_one=True)
 
-		if word_full_info:
-			find_words.append(word_full_info)
+        if word_full_info:
+            find_words.append(word_full_info)
 
-	return find_words
+    return find_words
 
 
 def search_notes(word_part: str, lang: str) -> List[Tuple[int, str, str, str, int]]:
-	db = connect_to_db()
+    db = connect_to_db()
 
-	is_first_letter = len(word_part) == 1
-	word_part = word_part.capitalize()
+    is_first_letter = len(word_part) == 1
+    word_part = word_part.capitalize()
 
-	query = queries.GET_NOTE_FULL_INFO_BY_TITLE(is_first_letter)
-	find_notes: list = db.query_execute(query, params=(word_part, lang), is_fetch_all=True)
+    query = queries.GET_NOTE_FULL_INFO_BY_TITLE(is_first_letter)
+    find_notes: list = db.query_execute(query, params=(word_part, lang), is_fetch_all=True)
 
-	if not find_notes:
-		word_part = word_part.lower()
-		find_notes: list = db.query_execute(query, params=(word_part, lang), is_fetch_all=True)
+    if not find_notes:
+        word_part = word_part.lower()
+        find_notes: list = db.query_execute(query, params=(word_part, lang), is_fetch_all=True)
 
-	return  find_notes
+    return  find_notes
 
 def prepare_words_and_check(req) -> Tuple[bool, str, str, str, str, str]:
-	data: dict = req.form
-	original_word = data.get('original_word')
-	word_ru = data.get('word_ru')
-	transcription = data.get('transcription')
-	lang = data.get('lang')
-	group = data.get('group')
-	is_err = False
+    data: dict = req.form
+    original_word = data.get('original_word')
+    word_ru = data.get('word_ru')
+    transcription = data.get('transcription')
+    lang = data.get('lang')
+    group = data.get('group')
+    is_err = False
 
-	if not original_word:
-		is_err = True
-	if not word_ru:
-		is_err = True
+    if not original_word:
+        is_err = True
+    if not word_ru:
+        is_err = True
 
-	if group in ('add', 'empty'):
-		group = ''
+    if group in ('add', 'empty'):
+        group = ''
 
-	if not is_err:
-		original_word = original_word.strip()
-		word_ru = word_ru.strip()
+    if not is_err:
+        original_word = original_word.strip()
+        word_ru = word_ru.strip()
 
-		if transcription:
-			transcription = transcription.strip()
+        if transcription:
+            transcription = transcription.strip()
 
-	return is_err, original_word, word_ru, transcription, group, lang
+    return is_err, original_word, word_ru, transcription, group, lang
 
 
 def get_words_from_concrete_dictionary(lang: str) -> List[Tuple[str, str, str, str]]:
-	db = connect_to_db()
-	words = db.query_execute(queries.GET_WORDS_OF_CONCRETE_LANG_INFO_FOR_GUESS_GAME, params=(lang,), is_fetch_all=True)
-	return words
+    db = connect_to_db()
+    words = db.query_execute(queries.GET_WORDS_OF_CONCRETE_LANG_INFO_FOR_GUESS_GAME, params=(lang,), is_fetch_all=True)
+    return words
 
 def read_words_from_file_and_add_to_dict(file_path: str, lang: str, delimiter: str):
-	with open(file=file_path, mode='r', encoding='UTF-8') as ff:
-		for i, line in enumerate(ff):
-			# if i == 0:
-			# 	continue
+    with open(file=file_path, mode='r', encoding='UTF-8') as ff:
+        for i, line in enumerate(ff):
+            # if i == 0:
+            # 	continue
 
-			items = line.split(delimiter)
+            items = line.split(delimiter)
 
-			try:
-				original_word = items[0].strip()
-			except IndexError:
-				original_word = ''
+            try:
+                original_word = items[0].strip()
+            except IndexError:
+                original_word = ''
 
-			try:
-				translate_word = items[1].strip()
-			except IndexError:
-				translate_word = ''
+            try:
+                translate_word = items[1].strip()
+            except IndexError:
+                translate_word = ''
 
-			try:
-				transcription = items[2].strip()
-			except IndexError:
-				transcription = ''
+            try:
+                transcription = items[2].strip()
+            except IndexError:
+                transcription = ''
 
-			try:
-				group = items[3].strip()
-			except IndexError:
-				group = ''
+            try:
+                group = items[3].strip()
+            except IndexError:
+                group = ''
 
-			add_word_in_db(original_word, translate_word, transcription, group, lang)
+            add_word_in_db(original_word, translate_word, transcription, group, lang)
 
 
 def load_db_from_gist() -> bool:
 
-	if not config.GIST_API_URL:
-		return False
+    if not config.GIST_API_URL:
+        return False
 
-	try:
-		response = requests.get(config.GIST_API_URL, headers=config.GIST_HEADERS)
-	except Exception:
-		return False
+    try:
+        response = requests.get(config.GIST_API_URL, headers=config.GIST_HEADERS)
+    except Exception:
+        return False
 
-	data: dict = response.json()
+    data: dict = response.json()
 
-	if not data:
-		return False
+    if not data:
+        return False
 
-	files: dict = data.get('files', {})
+    files: dict = data.get('files', {})
 
-	if not files:
-		return False
+    if not files:
+        return False
 
-	db_info: dict = files.get(config.DB_NAME)
-	content: str = db_info.get('content')
+    db_info: dict = files.get(config.DB_NAME)
+    content: str = db_info.get('content')
 
-	if not content:
-		return False
+    if not content:
+        return False
 
-	try:
-		db_binary = base64.b64decode(content)
-	except Exception:
-		db_binary = content.encode('utf-8')
+    try:
+        db_binary = base64.b64decode(content)
+    except Exception:
+        db_binary = content.encode('utf-8')
 
-	with open(config.PATH_TO_DB, 'wb') as f:
-		f.write(db_binary)
-		return True
+    with open(config.PATH_TO_DB, 'wb') as f:
+        f.write(db_binary)
+        return True
 
 
 def save_db_to_gist() -> bool:
 
-	if not config.GIST_API_URL:
-		return False
+    if not config.GIST_API_URL:
+        return False
 
-	with open(config.PATH_TO_DB, 'rb') as f:
-		db_binary = f.read()
+    with open(config.PATH_TO_DB, 'rb') as f:
+        db_binary = f.read()
 
-	encoded = base64.b64encode(db_binary).decode('utf-8')
+    encoded = base64.b64encode(db_binary).decode('utf-8')
 
-	data = {
-		'files': {config.DB_NAME: {'content': encoded}},
-		'description': 'SQLite Database',
-	}
+    data = {
+        'files': {config.DB_NAME: {'content': encoded}},
+        'description': 'SQLite Database',
+    }
 
-	try:
-		requests.patch(config.GIST_API_URL, headers=config.GIST_HEADERS, data=json.dumps(data))
-		return True
-	except Exception:
-		return False
+    try:
+        requests.patch(config.GIST_API_URL, headers=config.GIST_HEADERS, data=json.dumps(data))
+        return True
+    except Exception:
+        return False
+
+
+def get_db_hash(db_path: str):
+
+  with open(db_path, 'rb') as f:
+    file_hash = hashlib.md5()
+    file_hash.update(f.read())
+
+  return file_hash.hexdigest()

@@ -14,9 +14,9 @@ import signal
 
 app = Flask(__name__)
 
-
 def shutdown():
-  help_funcs.save_db_to_gist()
+  if init_db_hash != help_funcs.get_db_hash(config.PATH_TO_DB):
+    help_funcs.save_db_to_gist()
 
 atexit.register(shutdown)
 signal.signal(signal.SIGTERM, lambda s, f: help_funcs.save_db_to_gist())
@@ -25,6 +25,7 @@ signal.signal(signal.SIGTERM, lambda s, f: help_funcs.save_db_to_gist())
 with app.app_context():
   load_result = help_funcs.load_db_from_gist()
   print(load_result)
+  init_db_hash = help_funcs.get_db_hash(config.PATH_TO_DB)
 
 
 @app.route('/db/', methods=['GET', 'POST'])
