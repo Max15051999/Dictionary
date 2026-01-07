@@ -33,22 +33,20 @@
       {% endif %}
 
       <form action="." method="post" onsubmit="submit_btn.disabled = true; return true;">
-          <input class="input" id="title-input" type="text" name="note-title" value="{{note_title}}" placeholder="Введите название..." required oninput="submitBtn&&(submitBtn.disabled=false)">
+          <input class="input" id="title-input" type="text" name="note-title" value="{{note_title}}" placeholder="Введите название..." required oninput="submit_btn.disabled=false;">
           <br><br><br>
-          <textarea class="input" id="content-input" name="note-content" placeholder="Введите текст..." required rows="15" oninput="submitBtn&&(submitBtn.disabled=false)">{{note_content}}</textarea>
+          <textarea class="input" id="content-input" name="note-content" placeholder="Введите текст..." required rows="15" oninput="submit_btn.disabled=false;">{{note_content}}</textarea>
           <br><br><br><br>
-          <button id="submit-btn" type="submit">{{title}}</button>
+          <button id="submit_btn" type="submit">{{title}}</button>
+            <script>
+              if ('{{note_title}}')
+                submit_btn.disabled = true;
+          </script>
       </form>
       <br>
-      <a href="{{href_back}}" name="submit_btn"><button>Назад</button></a>
+      <a href="{{href_back}}"><button>Назад</button></a>
   </div>
   <script src="{{url_for('static', filename='scripts/theme.js')}}"></script>
   <script src="{{url_for('static', filename='scripts/scripts.js')}}"></script>
-  <script>
-      if ('{{note_title}}') {
-        var submitBtn = document.getElementById('submit-btn');
-        submitBtn.disabled = true;
-      }
-  </script>
 </body>
 </html>
