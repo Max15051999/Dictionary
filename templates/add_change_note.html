@@ -33,16 +33,22 @@
       {% endif %}
 
       <form action="." method="post" onsubmit="submit_btn.disabled = true; return true;">
-          <input class="input" id="title-input" type="text" name="note-title" value="{{note_title}}" placeholder="Введите название..." required>
+          <input class="input" id="title-input" type="text" name="note-title" value="{{note_title}}" placeholder="Введите название..." required oninput="submitBtn&&(submitBtn.disabled=false)">
           <br><br><br>
-          <textarea class="input" id="content-input" name="note-content" placeholder="Введите текст..." required rows="15">{{note_content}}</textarea>
+          <textarea class="input" id="content-input" name="note-content" placeholder="Введите текст..." required rows="15" oninput="submitBtn&&(submitBtn.disabled=false)">{{note_content}}</textarea>
           <br><br><br><br>
-          <button type="submit">{{title}}</button>
+          <button id="submit-btn" type="submit">{{title}}</button>
       </form>
       <br>
       <a href="{{href_back}}" name="submit_btn"><button>Назад</button></a>
   </div>
   <script src="{{url_for('static', filename='scripts/theme.js')}}"></script>
   <script src="{{url_for('static', filename='scripts/scripts.js')}}"></script>
+  <script>
+      if ('{{note_title}}') {
+        var submitBtn = document.getElementById('submit-btn');
+        submitBtn.disabled = true;
+      }
+  </script>
 </body>
 </html>
