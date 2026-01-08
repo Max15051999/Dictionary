@@ -164,12 +164,12 @@ def get_words_from_concrete_dictionary(lang: str) -> List[Tuple[str, str, str, s
     words = db.query_execute(queries.GET_WORDS_OF_CONCRETE_LANG_INFO_FOR_GUESS_GAME, params=(lang,), is_fetch_all=True)
     return words
 
-def read_words_from_file_and_add_to_dict(file_path: str, lang: str, delimiter: str):
+def read_words_from_file_and_add_to_dict(file_path: str, lang: str, delimiter: str, has_columns: bool = False):
     with open(file=file_path, mode='r', encoding='UTF-8') as ff:
-        for i, line in enumerate(ff):
-            # if i == 0:
-            # 	continue
+        if has_columns:
+            ff.__next__()
 
+        for i, line in enumerate(ff):
             items = line.split(delimiter)
 
             try:

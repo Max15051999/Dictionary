@@ -581,6 +581,7 @@ def update_service(service: str, first_lang: str, second_lang: str):
 def upload_file(lang: str):
   file = request.files['words']
   delimiter = request.form['delimiter']
+  has_columns = request.form.get('has_columns') == 'on'
 
   if not exists(config.FILES_DIR_PATH):
     makedirs(config.FILES_DIR_PATH)
@@ -588,7 +589,7 @@ def upload_file(lang: str):
   file_full_path = config.FILES_DIR_PATH + file.filename
   file.save(file_full_path)
 
-  help_funcs.read_words_from_file_and_add_to_dict(file_full_path, lang, delimiter)
+  help_funcs.read_words_from_file_and_add_to_dict(file_full_path, lang, delimiter, has_columns)
 
   remove(file_full_path)
 

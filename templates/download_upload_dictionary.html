@@ -120,6 +120,8 @@
         {% else %}
             <form enctype="multipart/form-data" method="POST" action="/upload_file/{{lang}}/">
                 {% include 'delimiters.html' %}
+                <input id="has-columns" type="checkbox" name="has_columns">
+                <label for="has-columns">Есть названия столбцов?</label><br><br>
                 <input id="upload-file" type="file" accept=".txt, .csv" name="words"><br><br>
                 <button type="submit">Загрузить</button>
             </form>
