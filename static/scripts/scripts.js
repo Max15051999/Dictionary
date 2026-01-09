@@ -156,10 +156,13 @@ function deleteWord(wordId, wordEn = '', lang = '') {
 //            idx++;
 //        }
 
-        if (selectedWordIds.length > 0)
+        var wordsGroup = '';
+        if (selectedWordIds.length > 0) {
             msg = 'Вы действительно хотите удалить выделенные слова?';
-        else
+        } else {
             msg = 'Вы действительно хотите удалить все слова из словаря?';
+            wordsGroup = groupsSelector.value
+        }
     } else {
         selectedWordIds.push([wordId]);
     }
@@ -172,7 +175,7 @@ function deleteWord(wordId, wordEn = '', lang = '') {
               headers: {
                 'Content-Type': 'application/json',
               },
-              body: JSON.stringify({wordIds: selectedWordIds, lang: lang})
+              body: JSON.stringify({wordIds: selectedWordIds, wordsGroup: wordsGroup, lang: lang})
         });
 
         setTimeout(() => {

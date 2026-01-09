@@ -14,18 +14,18 @@ import signal
 
 app = Flask(__name__)
 
-def shutdown():
-  if init_db_hash != help_funcs.get_db_hash(config.PATH_TO_DB):
-    help_funcs.save_db_to_gist()
-
-atexit.register(shutdown)
-signal.signal(signal.SIGTERM, lambda s, f: help_funcs.save_db_to_gist())
-
-# Before starting service
-with app.app_context():
-  load_result = help_funcs.load_db_from_gist()
-  print(load_result)
-  init_db_hash = help_funcs.get_db_hash(config.PATH_TO_DB)
+# def shutdown():
+#   if init_db_hash != help_funcs.get_db_hash(config.PATH_TO_DB):
+#     help_funcs.save_db_to_gist()
+#
+# atexit.register(shutdown)
+# signal.signal(signal.SIGTERM, lambda s, f: help_funcs.save_db_to_gist())
+#
+# # Before starting service
+# with app.app_context():
+#   load_result = help_funcs.load_db_from_gist()
+#   print(load_result)
+#   init_db_hash = help_funcs.get_db_hash(config.PATH_TO_DB)
 
 
 @app.route('/db/', methods=['GET', 'POST'])
@@ -376,13 +376,23 @@ def delete_word():
 
   # print('DATA:', data)
   word_remove_ids: list = data['wordIds']
+  words_group = data['wordsGroup']
   lang: str = data['lang']
 
   if word_remove_ids:
     db.query_execute(queries.DELETE_WORD_BY_ID, params=word_remove_ids, is_ext=True)
     # print('DELETE WORD:', word_id)
   else:
-    db.query_execute(queries.DELETE_ALL_WORDS_BY_LANG, params=(lang,))
+    query = queries.DELETE_ALL_WORDS_BY_GROUP_AND_LANG
+    if words_group == 'all':
+      query = queries.DELETE_ALL_WORDS_BY_LANG
+      params = (lang,)
+    elif words_group == 'without_group':
+      params = ('', lang)
+    else:
+      params = (words_group, lang)
+
+    db.query_execute(query, params=params)
 
   return show_dictionary(lang)
 
