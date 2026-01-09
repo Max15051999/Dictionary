@@ -160,8 +160,12 @@ function deleteWord(wordId, wordEn = '', lang = '') {
         if (selectedWordIds.length > 0) {
             msg = 'Вы действительно хотите удалить выделенные слова?';
         } else {
-            msg = 'Вы действительно хотите удалить все слова из словаря?';
             wordsGroup = groupsSelector.value
+
+            if (wordsGroup == 'all' || wordsGroup == 'without_group')
+                msg = 'Вы действительно хотите удалить все слова из словаря?';
+            else
+                msg = `Вы действительно хотите удалить все слова из группы ${wordsGroup}`;
         }
     } else {
         selectedWordIds.push([wordId]);
