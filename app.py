@@ -16,6 +16,7 @@ app = Flask(__name__)
 
 def shutdown():
   if init_db_hash != help_funcs.get_db_hash(config.PATH_TO_DB):
+    print('DB BACKUP UPDATED')
     help_funcs.save_db_to_gist()
 
 atexit.register(shutdown)
@@ -24,7 +25,7 @@ signal.signal(signal.SIGTERM, lambda s, f: help_funcs.save_db_to_gist())
 # Before starting service
 with app.app_context():
   load_result = help_funcs.load_db_from_gist()
-  print(load_result)
+  print('DB BACKUP LOADED', load_result)
   init_db_hash = help_funcs.get_db_hash(config.PATH_TO_DB)
 
 
