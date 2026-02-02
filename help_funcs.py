@@ -60,16 +60,9 @@ def get_translate_by_word(word: str, first_lang: str, is_part_word: bool, second
 def check_if_word_in_db(original_word: str, lang: str) -> bool:
     db = connect_to_db()
 
-    word = original_word.capitalize()
+    word_in_db = db.query_execute(queries.GET_WORDS_AMOUNT_BY_ORIGINAL_WORD, params=(lang, original_word), is_fetch_one=True)[0]
 
-    for i in range(2):
-        word_in_db = db.query_execute(queries.GET_WORDS_AMOUNT_BY_ORIGINAL_WORD, params=(lang, word), is_fetch_one=True)[0]
-
-        if word_in_db == 0:
-            word = word.lower()
-        else:
-            return True
-    return False
+    return word_in_db
 
 def add_word_in_db(original_word: str, word_ru: str, transcription: str, group: str, lang: str):
     original_word = original_word.replace("'", 'z*z').title().replace('z*Z', "'")

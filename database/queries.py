@@ -58,7 +58,7 @@ GET_DICTIONARIES = f""" SELECT DISTINCT lang FROM {config.WORDS_TABLE_NAME}; """
 
 GET_WORD_FULL_INFO_BY_WORD = lambda field : f""" SELECT * FROM {config.WORDS_TABLE_NAME} WHERE {field} = ? AND lang = ?; """
 
-GET_WORDS_AMOUNT_BY_ORIGINAL_WORD = f""" SELECT COUNT(*) FROM {config.WORDS_TABLE_NAME} WHERE lang = ? AND original = ?; """
+GET_WORDS_AMOUNT_BY_ORIGINAL_WORD = f""" SELECT COUNT(*) FROM {config.WORDS_TABLE_NAME} WHERE lang = ? AND LOWER(original) = LOWER(?); """
 
 # GET_ALL_WORDS_INFO_FOR_GUESS_GAME = f'SELECT original, translate, transcription, lang, date_to_add FROM {config.TABLE_NAME};'
 
