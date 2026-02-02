@@ -377,13 +377,14 @@ def delete_word():
 
   # print('DATA:', data)
   word_remove_ids: list = data['wordIds']
-  words_group = data['wordsGroup']
   lang: str = data['lang']
 
   if word_remove_ids:
     db.query_execute(queries.DELETE_WORD_BY_ID, params=word_remove_ids, is_ext=True)
     # print('DELETE WORD:', word_id)
   else:
+    words_group = data['wordsGroup']
+
     query = queries.DELETE_ALL_WORDS_BY_GROUP_AND_LANG
     if words_group == 'all':
       query = queries.DELETE_ALL_WORDS_BY_LANG
